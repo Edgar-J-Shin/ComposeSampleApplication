@@ -1,4 +1,4 @@
-package com.shinjh1253.presentation.core
+package com.shinjh1253.presentation.core.ui
 
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow

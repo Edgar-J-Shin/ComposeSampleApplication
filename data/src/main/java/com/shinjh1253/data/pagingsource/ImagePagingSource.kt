@@ -38,6 +38,9 @@ class ImagePagingSource(
         } catch (e: Exception) {
             Timber.e(e)
             LoadResult.Error(e)
+        } catch (t: Throwable) {
+            Timber.e(t)
+            LoadResult.Error(t)
         }
     }
 
