@@ -59,4 +59,8 @@ dependencies {
 
     // debug
     implementation(libs.timber)
+
+    // test
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
 }

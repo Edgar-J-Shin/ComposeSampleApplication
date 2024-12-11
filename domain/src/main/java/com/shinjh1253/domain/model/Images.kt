@@ -1,10 +1,5 @@
 package com.shinjh1253.domain.model
 
-data class Images(
-    val documents: List<Document>,
-    val meta: Meta,
-)
-
 data class Document(
     val collection: String,
     val datetime: String,
@@ -14,10 +9,4 @@ data class Document(
     val imageUrl: String,
     val thumbnailUrl: String,
     val width: Int,
-)
-
-data class Meta(
-    val isEnd: Boolean,
-    val pageableCount: Int,
-    val totalCount: Int,
 )
