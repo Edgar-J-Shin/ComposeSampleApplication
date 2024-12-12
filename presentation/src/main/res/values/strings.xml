@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ComposeApplication</string>
+    <string name="search">search</string>
+    <string name="bookmark">bookmark</string>
+    <string name="searchbar_hint">query</string>
+    <string name="desc_search">search</string>
+    <string name="desc_clear">clear</string>
+    <string name="search_query_empty_error">empty query</string>
+    <string name="api_response_error_message">Could not load data!</string>
+    <string name="retry">retry</string>
+    <string name="empty_content_list_message">Empty contents!</string>
+    <string name="image_content_description">image</string>
 </resources>
