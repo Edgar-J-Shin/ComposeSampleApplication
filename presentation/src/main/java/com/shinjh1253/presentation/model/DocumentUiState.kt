@@ -9,7 +9,10 @@ data class DocumentUiState(
     val imageUrl: String,
     val thumbnailUrl: String,
     val width: Int,
+    val bookmark: Boolean,
 ) {
+    var onBookmarkClick: ((DocumentUiState, Boolean) -> Unit)? = null
+
     companion object {
         val Empty = DocumentUiState(
             collection = "",
@@ -20,6 +23,7 @@ data class DocumentUiState(
             imageUrl = "",
             thumbnailUrl = "",
             width = 0,
+            bookmark = false
         )
     }
 }

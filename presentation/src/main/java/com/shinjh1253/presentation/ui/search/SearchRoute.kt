@@ -29,6 +29,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -36,6 +37,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -274,14 +276,36 @@ fun ImageItem(
             .fillMaxWidth()
             .padding(all = 4.dp)
     ) {
-        BasicImage(
-            imageUrl = documentUiState.thumbnailUrl,
-            contentScale = ContentScale.Crop,
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(all = 4.dp)
-                .clip(RoundedCornerShape(8.dp))
-        )
+                .fillMaxWidth()
+        ) {
+            BasicImage(
+                imageUrl = documentUiState.thumbnailUrl,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(all = 4.dp)
+                    .clip(RoundedCornerShape(8.dp))
+            )
+
+            Icon(
+                painter = painterResource(
+                    id =
+                    if (documentUiState.bookmark) R.drawable.ic_bookmark_on else R.drawable.ic_bookmark_off
+                ),
+                contentDescription = stringResource(id = R.string.desc_bookmark),
+                modifier = Modifier
+                    .padding(all = 4.dp)
+                    .align(Alignment.TopEnd)
+                    .clickable {
+                        documentUiState.onBookmarkClick?.invoke(
+                            documentUiState,
+                            !documentUiState.bookmark
+                        )
+                    }
+            )
+        }
 
         Text(
             modifier = modifier

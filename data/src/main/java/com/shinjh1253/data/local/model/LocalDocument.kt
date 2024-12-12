@@ -1,6 +1,6 @@
-package com.shinjh1253.domain.model
+package com.shinjh1253.data.local.model
 
-data class Document(
+data class LocalDocument(
     val collection: String,
     val datetime: String,
     val displaySitename: String,
