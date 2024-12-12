@@ -25,6 +25,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.dimensionResource
@@ -64,21 +66,24 @@ fun SearchRoute(
     viewModel: SearchViewModel = hiltViewModel(),
     showSnackBar: (String, SnackbarDuration) -> Unit = { _, _ -> },
 ) {
-//    val context = LocalContext.current
-//    viewModel.effect.collectAsEffect { effect ->
-//        when (effect) {
-//            is SearchEffect.NavigateToSearchResult -> {
-//                navigateToSearchResult(effect.keyword)
-//            }
-//
-//            is SearchEffect.ShowSnackbar -> {
-//                showSnackBar(
-//                    context.getString(effect.state.messageResId),
-//                    effect.state.duration
-//                )
-//            }
-//        }
-//    }
+    val context = LocalContext.current
+    LaunchedEffect(key1 = viewModel.uiEffect) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is SearchUiEffect.ShowSnackbar -> {
+                    showSnackBar(
+                        context.getString(effect.state.messageResId),
+                        effect.state.duration
+                    )
+                }
+
+                is SearchUiEffect.ErrorMessage -> {
+//                    showErrorMessage(effect.message)
+                }
+            }
+        }
+    }
+
 
     val searchUiState by viewModel.searchUiState.collectAsStateWithLifecycle()
     val searchResultUiState = viewModel.searchResultUiState.collectAsLazyPagingItems()

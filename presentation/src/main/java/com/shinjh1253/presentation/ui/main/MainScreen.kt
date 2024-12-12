@@ -49,7 +49,7 @@ fun MainRoute(
         Box(modifier = Modifier.padding(paddingValues)) {
             MainNavHost(
                 mainNavController = navHostController,
-                startDestination = Screen.Main.MainTab.Search.route,
+                startDestination = Screen.MainTab.Search.route,
                 showSnackBar = { message, duration ->
                     scope.launch {
                         snackBarHostState.showSnackbar(
@@ -76,13 +76,13 @@ private fun MainNavHost(
         navController = mainNavController,
         startDestination = startDestination
     ) {
-        composable(route = Screen.Main.MainTab.Search.route) {
+        composable(route = Screen.MainTab.Search.route) {
             SearchRoute(
                 showSnackBar = showSnackBar
             )
         }
 
-        composable(route = Screen.Main.MainTab.Bookmark.route) {
+        composable(route = Screen.MainTab.Bookmark.route) {
             BookmarkRoute(
                 showSnackBar = showSnackBar
             )

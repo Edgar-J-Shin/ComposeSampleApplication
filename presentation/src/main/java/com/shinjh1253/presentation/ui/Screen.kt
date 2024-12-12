@@ -11,34 +11,27 @@ sealed class Screen(
     val route: String,
     val navArguments: ImmutableList<NamedNavArgument> = persistentListOf(),
 ) {
+    sealed class MainTab(
+        route: String,
+        @StringRes val titleResId: Int,
+        @DrawableRes val iconResId: Int,
+    ) : Screen(route, persistentListOf()) {
 
-    data object Main : Screen(route = ROUTE_MAIN) {
+        data object Search : MainTab(
+            route = ROUTE_SEARCH,
+            titleResId = R.string.search,
+            iconResId = R.drawable.ic_search
+        )
 
-        sealed class MainTab(
-            route: String,
-            @StringRes val titleResId: Int,
-            @DrawableRes val iconResId: Int,
-        ) : Screen(route, persistentListOf()) {
-
-            data object Search : MainTab(
-                route = ROUTE_SEARCH,
-                titleResId = R.string.search,
-                iconResId = R.drawable.ic_search
-            )
-
-            data object Bookmark : MainTab(
-                route = ROUTE_BOOKMARK,
-                titleResId = R.string.bookmark,
-                iconResId = R.drawable.ic_bookmarks
-            )
-        }
+        data object Bookmark : MainTab(
+            route = ROUTE_BOOKMARK,
+            titleResId = R.string.bookmark,
+            iconResId = R.drawable.ic_bookmarks
+        )
     }
 
     companion object {
-        const val ROUTE_MAIN = "main"
         const val ROUTE_SEARCH = "search"
         const val ROUTE_BOOKMARK = "bookmark"
-
-        const val SEARCH_RESULT_KEYWORD = "SearchResultKeyword"
     }
 }

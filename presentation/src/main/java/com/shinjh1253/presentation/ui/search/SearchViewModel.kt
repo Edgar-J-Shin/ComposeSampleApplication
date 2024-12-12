@@ -8,6 +8,7 @@ import androidx.paging.map
 import com.shinjh1253.domain.usecase.GetBookmarksUseCase
 import com.shinjh1253.domain.usecase.GetImagesUseCase
 import com.shinjh1253.domain.usecase.UpdateBookmarkUseCase
+import com.shinjh1253.domain.usecase.UpdateKeywordUseCase
 import com.shinjh1253.presentation.core.state.SnackbarState
 import com.shinjh1253.presentation.core.ui.EventDelegate
 import com.shinjh1253.presentation.model.DocumentUiState
@@ -37,6 +38,7 @@ class SearchViewModel @Inject constructor(
     private val getImagesUseCase: GetImagesUseCase,
     private val updateBookmarkUseCase: UpdateBookmarkUseCase,
     private val getBookmarksUseCase: GetBookmarksUseCase,
+    private val updateKeywordUseCase: UpdateKeywordUseCase
 ) :
     ViewModel(),
     EventDelegate<SearchUiEffect, SearchUiEvent> by EventDelegate.EventDelegateImpl() {
@@ -55,6 +57,8 @@ class SearchViewModel @Inject constructor(
     val searchResultUiState = searchUiState
         .debounce(1000L)
         .flatMapLatest {
+            updateKeywordUseCase(it.query.keyword)
+
             if (it.queryNotEmpty()) {
                 getImagesUseCase(it.query.keyword)
                     .map { pagingData ->
