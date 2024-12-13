@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shinjh1253.domain.usecase.GetBookmarksUseCase
 import com.shinjh1253.domain.usecase.RemoveBookmarksUseCase
-import com.shinjh1253.domain.usecase.UpdateBookmarkUseCase
 import com.shinjh1253.presentation.core.state.SnackbarState
 import com.shinjh1253.presentation.core.ui.EventDelegate
 import com.shinjh1253.presentation.core.ui.UiState
@@ -35,7 +34,6 @@ import javax.inject.Inject
 class BookmarkViewModel @Inject constructor(
     getBookmarksUseCase: GetBookmarksUseCase,
     private val removeBookmarksUseCase: RemoveBookmarksUseCase,
-    private val updateBookmarkUseCase: UpdateBookmarkUseCase,
 ) :
     ViewModel(),
     EventDelegate<BookmarkUiEffect, BookmarkUiEvent> by EventDelegate.EventDelegateImpl() {
@@ -92,19 +90,6 @@ class BookmarkViewModel @Inject constructor(
     private fun clearSelectedBookmarks() {
         viewModelScope.launch {
             _selectedBookmarks.emit(emptyList())
-        }
-    }
-
-    private fun updateBookmark(
-        documentUiState: DocumentUiState,
-        isBookmarked: Boolean,
-    ) {
-        viewModelScope.launch(coroutineExceptionHandler) {
-            updateBookmarkUseCase(
-                keyword = searchUiState.value.query.keyword,
-                document = documentUiState.toEntity(),
-                isBookmarked = isBookmarked,
-            )
         }
     }
 

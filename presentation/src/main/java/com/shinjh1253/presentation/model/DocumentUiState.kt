@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 
 data class DocumentUiState(
     val collection: String,
-    val datetime: String,
+    val datetime: LocalDateTime,
     val displaySitename: String,
     val docUrl: String,
     val height: Int,
@@ -17,28 +17,13 @@ data class DocumentUiState(
     val isSelected: Boolean
 ) {
     var onBookmarkClick: ((DocumentUiState, Boolean) -> Unit)? = null
-
-    companion object {
-        val Empty = DocumentUiState(
-            collection = "",
-            datetime = "",
-            displaySitename = "",
-            docUrl = "",
-            height = 0,
-            imageUrl = "",
-            thumbnailUrl = "",
-            width = 0,
-            bookmark = false,
-            isSelected = false
-        )
-    }
 }
 
 class BookmarkItemUiStateProvider :
     PreviewParameterProvider<Pair<Boolean, DocumentUiState>> {
     private val documentUiState = DocumentUiState(
         collection = "blog",
-        datetime = LocalDateTime.now().toString(),
+        datetime = LocalDateTime.now(),
         displaySitename = "네이버블로그",
         docUrl = "http://blog.naver.com/jec_crabhouse/223526236563",
         height = 640,
@@ -65,7 +50,7 @@ class BookmarkUiStateProvider :
 
     private val documentUiState = DocumentUiState(
         collection = "blog",
-        datetime = LocalDateTime.now().toString(),
+        datetime = LocalDateTime.now(),
         displaySitename = "네이버블로그",
         docUrl = "http://blog.naver.com/jec_crabhouse/223526236563",
         height = 640,

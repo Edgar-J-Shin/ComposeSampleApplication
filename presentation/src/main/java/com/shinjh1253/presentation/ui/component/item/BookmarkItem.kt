@@ -63,7 +63,10 @@ fun BookmarkItem(
                     Text(
                         modifier = Modifier
                             .padding(horizontal = 4.dp),
-                        text = stringResource(id = R.string.site_name, documentUiState.displaySitename),
+                        text = stringResource(
+                            id = R.string.site_name,
+                            documentUiState.displaySitename
+                        ),
                         textAlign = TextAlign.Left,
                         maxLines = 1,
                         fontSize = 12.sp,
@@ -76,7 +79,10 @@ fun BookmarkItem(
                 Text(
                     modifier = Modifier
                         .padding(horizontal = 4.dp),
-                    text = stringResource(id = R.string.datetime, documentUiState.datetime),
+                    text = stringResource(
+                        id = R.string.datetime,
+                        documentUiState.datetime.toLocalDate()
+                    ),
                     textAlign = TextAlign.Left,
                     maxLines = 1,
                     fontSize = 12.sp,

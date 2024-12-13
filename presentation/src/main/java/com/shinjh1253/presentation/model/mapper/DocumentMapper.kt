@@ -2,15 +2,13 @@ package com.shinjh1253.presentation.model.mapper
 
 import com.shinjh1253.domain.model.Document
 import com.shinjh1253.presentation.model.DocumentUiState
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 fun Document.toUiState(
     onBookmarkClick: (DocumentUiState, Boolean) -> Unit = { _, _ -> },
 ): DocumentUiState =
     DocumentUiState(
         collection = collection,
-        datetime = datetime.toLocalDate().toString(),
+        datetime = datetime,
         displaySitename = displaySitename,
         docUrl = docUrl,
         height = height,
@@ -26,7 +24,7 @@ fun Document.toUiState(
 fun DocumentUiState.toEntity(): Document =
     Document(
         collection = collection,
-        datetime = LocalDateTime.parse(datetime, DateTimeFormatter.ISO_DATE_TIME),
+        datetime = datetime,
         displaySitename = displaySitename,
         docUrl = docUrl,
         height = height,

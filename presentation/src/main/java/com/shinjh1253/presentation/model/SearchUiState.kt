@@ -25,7 +25,7 @@ class SearchUiStateProvider :
 
     private val documentUiState = DocumentUiState(
         collection = "blog",
-        datetime = LocalDateTime.now().toString(),
+        datetime = LocalDateTime.now(),
         displaySitename = "네이버블로그",
         docUrl = "http://blog.naver.com/jec_crabhouse/223526236563",
         height = 640,
