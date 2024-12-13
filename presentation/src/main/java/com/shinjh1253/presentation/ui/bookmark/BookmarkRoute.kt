@@ -16,12 +16,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shinjh1253.presentation.R
 import com.shinjh1253.presentation.core.ui.ErrorScreen
+import com.shinjh1253.presentation.core.ui.LoadingScreen
+import com.shinjh1253.presentation.core.ui.UiState
+import com.shinjh1253.presentation.model.BookmarkUiStateProvider
 import com.shinjh1253.presentation.model.DocumentUiState
-import com.shinjh1253.presentation.ui.search.ImageItem
+import com.shinjh1253.presentation.ui.component.ContentItem
+import com.shinjh1253.presentation.ui.theme.ComposeApplicationTheme
 
 @Composable
 fun BookmarkRoute(
@@ -52,26 +58,33 @@ fun BookmarkRoute(
 
 @Composable
 private fun BookmarkScreen(
-    bookmarkUiState: List<DocumentUiState>,
+    bookmarkUiState: UiState<List<DocumentUiState>>,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
     ) {
-        val isNotEmpty = bookmarkUiState.isNotEmpty()
-        val isEmpty = bookmarkUiState.isEmpty()
-
-        when {
-            isEmpty -> {
-                ErrorScreen(message = stringResource(id = R.string.empty_content_list_message))
+        when (bookmarkUiState) {
+            is UiState.Loading -> {
+                LoadingScreen()
             }
 
-            isNotEmpty -> {
-                VerticalGridBookmarkContent(
-                    bookmarkUiState = bookmarkUiState,
-                    modifier = Modifier
-                        .fillMaxSize()
+            is UiState.Error -> {
+                ErrorScreen(
+                    message = stringResource(id = R.string.api_response_error_message),
                 )
+            }
+
+            is UiState.Success -> {
+                if (bookmarkUiState.data.isEmpty()) {
+                    ErrorScreen(message = stringResource(id = R.string.empty_content_list_message))
+                } else {
+                    VerticalGridBookmarkContent(
+                        bookmarkUiState = bookmarkUiState.data,
+                        modifier = Modifier
+                            .fillMaxSize()
+                    )
+                }
             }
         }
     }
@@ -98,11 +111,24 @@ fun VerticalGridBookmarkContent(
             items = bookmarkUiState,
             key = { it.imageUrl }
         ) { document ->
-            ImageItem(
+            ContentItem(
                 modifier = Modifier
                     .fillMaxWidth(),
                 documentUiState = document,
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BookmarkScreenPreview(
+    @PreviewParameter(BookmarkUiStateProvider::class) item: UiState<List<DocumentUiState>>,
+) {
+    ComposeApplicationTheme {
+        BookmarkScreen(
+            bookmarkUiState = item,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }

@@ -7,6 +7,8 @@ import com.shinjh1253.domain.usecase.GetKeywordUseCase
 import com.shinjh1253.domain.usecase.UpdateBookmarkUseCase
 import com.shinjh1253.presentation.core.state.SnackbarState
 import com.shinjh1253.presentation.core.ui.EventDelegate
+import com.shinjh1253.presentation.core.ui.UiState
+import com.shinjh1253.presentation.core.ui.asUiState
 import com.shinjh1253.presentation.model.DocumentUiState
 import com.shinjh1253.presentation.model.mapper.toEntity
 import com.shinjh1253.presentation.model.mapper.toUiState
@@ -63,9 +65,10 @@ class BookmarkViewModel @Inject constructor(
                     }
                 }
         }
+        .asUiState()
         .stateIn(
             scope = viewModelScope,
-            initialValue = emptyList(),
+            initialValue = UiState.Loading,
             started = SharingStarted.WhileSubscribed(5_000)
         )
 
