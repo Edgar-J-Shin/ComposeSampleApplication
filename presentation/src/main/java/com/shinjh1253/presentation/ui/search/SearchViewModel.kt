@@ -8,7 +8,6 @@ import androidx.paging.map
 import com.shinjh1253.domain.usecase.GetBookmarksUseCase
 import com.shinjh1253.domain.usecase.GetImagesUseCase
 import com.shinjh1253.domain.usecase.UpdateBookmarkUseCase
-import com.shinjh1253.domain.usecase.UpdateKeywordUseCase
 import com.shinjh1253.presentation.core.state.SnackbarState
 import com.shinjh1253.presentation.core.ui.EventDelegate
 import com.shinjh1253.presentation.model.DocumentUiState
@@ -16,6 +15,7 @@ import com.shinjh1253.presentation.model.KeywordUiState
 import com.shinjh1253.presentation.model.SearchUiState
 import com.shinjh1253.presentation.model.mapper.toEntity
 import com.shinjh1253.presentation.model.mapper.toUiState
+import com.shinjh1253.presentation.ui.component.searchbar.SearchbarUiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,7 +38,6 @@ class SearchViewModel @Inject constructor(
     private val getImagesUseCase: GetImagesUseCase,
     private val updateBookmarkUseCase: UpdateBookmarkUseCase,
     private val getBookmarksUseCase: GetBookmarksUseCase,
-    private val updateKeywordUseCase: UpdateKeywordUseCase
 ) :
     ViewModel(),
     EventDelegate<SearchUiEffect, SearchUiEvent> by EventDelegate.EventDelegateImpl() {
@@ -66,8 +64,6 @@ class SearchViewModel @Inject constructor(
         .filter { it.queryNotEmpty() }
         .map { it.query.keyword }
         .flatMapLatest { keyword ->
-            updateKeywordUseCase(keyword)
-
             getImagesUseCase(keyword)
                 .map { pagingData ->
                     pagingData.map { document ->
@@ -126,17 +122,17 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    override fun dispatchEvent(event: SearchUiEvent) {
+    fun dispatchSearchEvent(event: SearchbarUiEvent) {
         when (event) {
-            is SearchUiEvent.OnSearchTextChanged -> {
+            is SearchbarUiEvent.OnSearchTextChanged -> {
                 updateSearchText(event.query)
             }
 
-            is SearchUiEvent.OnClearSearchTextClick -> {
+            is SearchbarUiEvent.OnClearSearchTextClick -> {
                 clearSearchText()
             }
 
-            is SearchUiEvent.OnSearch -> {
+            is SearchbarUiEvent.OnSearch -> {
                 search(event.keyword)
             }
         }

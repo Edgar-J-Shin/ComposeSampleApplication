@@ -31,7 +31,8 @@ data class DocumentUiState(
     }
 }
 
-class BookmarkUiStateProvider : PreviewParameterProvider<UiState<List<DocumentUiState>>> {
+class BookmarkUiStateProvider :
+    PreviewParameterProvider<Pair<SearchUiState, UiState<List<DocumentUiState>>>> {
 
     private val documentUiState = DocumentUiState(
         collection = "blog",
@@ -45,7 +46,7 @@ class BookmarkUiStateProvider : PreviewParameterProvider<UiState<List<DocumentUi
         bookmark = false
     )
 
-    override val values: Sequence<UiState<List<DocumentUiState>>>
+    override val values: Sequence<Pair<SearchUiState, UiState<List<DocumentUiState>>>>
         /**
          * 1. Loading
          * 2. Error
@@ -53,10 +54,10 @@ class BookmarkUiStateProvider : PreviewParameterProvider<UiState<List<DocumentUi
          * 4. Success with data
          */
         get() = sequenceOf(
-            UiState.Loading,
-            UiState.Error(Exception("Unknown error")),
-            UiState.Success(emptyList()),
-            UiState.Success(
+            SearchUiState(query = KeywordUiState("")) to UiState.Loading,
+            SearchUiState(query = KeywordUiState("")) to UiState.Error(Exception("Unknown error")),
+            SearchUiState(query = KeywordUiState("")) to UiState.Success(emptyList()),
+            SearchUiState(query = KeywordUiState("")) to UiState.Success(
                 listOf(
                     documentUiState,
                     documentUiState.copy(

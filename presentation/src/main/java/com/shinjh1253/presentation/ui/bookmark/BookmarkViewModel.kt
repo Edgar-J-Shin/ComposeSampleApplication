@@ -3,22 +3,30 @@ package com.shinjh1253.presentation.ui.bookmark
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shinjh1253.domain.usecase.GetBookmarksUseCase
-import com.shinjh1253.domain.usecase.GetKeywordUseCase
 import com.shinjh1253.domain.usecase.UpdateBookmarkUseCase
 import com.shinjh1253.presentation.core.state.SnackbarState
 import com.shinjh1253.presentation.core.ui.EventDelegate
 import com.shinjh1253.presentation.core.ui.UiState
 import com.shinjh1253.presentation.core.ui.asUiState
 import com.shinjh1253.presentation.model.DocumentUiState
+import com.shinjh1253.presentation.model.KeywordUiState
+import com.shinjh1253.presentation.model.SearchUiState
 import com.shinjh1253.presentation.model.mapper.toEntity
 import com.shinjh1253.presentation.model.mapper.toUiState
+import com.shinjh1253.presentation.ui.component.searchbar.SearchbarUiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,7 +34,6 @@ import javax.inject.Inject
 class BookmarkViewModel @Inject constructor(
     getBookmarksUseCase: GetBookmarksUseCase,
     private val updateBookmarkUseCase: UpdateBookmarkUseCase,
-    getKeywordUseCase: GetKeywordUseCase,
 ) :
     ViewModel(),
     EventDelegate<BookmarkUiEffect, BookmarkUiEvent> by EventDelegate.EventDelegateImpl() {
@@ -44,17 +51,16 @@ class BookmarkViewModel @Inject constructor(
             }
         }
 
-    private val cachedKeyword = getKeywordUseCase()
-        .stateIn(
-            scope = viewModelScope,
-            initialValue = "",
-            started = SharingStarted.WhileSubscribed(5_000)
-        )
+    private val _searchUiState = MutableStateFlow(SearchUiState.Empty)
+    val searchUiState = _searchUiState.asStateFlow()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val bookmarkUiState = getKeywordUseCase()
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    val bookmarkUiState = searchUiState
+        .debounce(1000L)
+        .filter { it.queryNotEmpty() }
+        .map { it.query.keyword }
         .flatMapLatest { keyword ->
-            getBookmarksUseCase(keyword)
+            getBookmarksUseCase(searchUiState.value.query.keyword)
                 .map { documents ->
                     documents.map { document ->
                         document.toUiState().copy(
@@ -78,14 +84,45 @@ class BookmarkViewModel @Inject constructor(
     ) {
         viewModelScope.launch(coroutineExceptionHandler) {
             updateBookmarkUseCase(
-                keyword = cachedKeyword.value,
+                keyword = searchUiState.value.query.keyword,
                 document = documentUiState.toEntity(),
                 isBookmarked = isBookmarked,
             )
         }
     }
 
-    override fun dispatchEvent(event: BookmarkUiEvent) {
+    private fun updateSearchText(newText: String) {
+        _searchUiState.update { it.copy(query = KeywordUiState(newText)) }
+    }
 
+    private fun clearSearchText() {
+        _searchUiState.update { it.copy(query = KeywordUiState("")) }
+    }
+
+    private fun search(query: String) {
+        viewModelScope.launch {
+            if (query.isEmpty()) {
+                emitUiEffect(BookmarkUiEffect.ShowSnackbar(state = SnackbarState.EmptyQueryErrorMessage))
+                clearSearchText()
+            } else {
+                updateSearchText(query)
+            }
+        }
+    }
+
+    fun dispatchSearchEvent(event: SearchbarUiEvent) {
+        when (event) {
+            is SearchbarUiEvent.OnSearchTextChanged -> {
+                updateSearchText(event.query)
+            }
+
+            is SearchbarUiEvent.OnClearSearchTextClick -> {
+                clearSearchText()
+            }
+
+            is SearchbarUiEvent.OnSearch -> {
+                search(event.keyword)
+            }
+        }
     }
 }

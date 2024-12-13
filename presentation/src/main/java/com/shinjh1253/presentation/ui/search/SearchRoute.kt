@@ -1,39 +1,19 @@
 package com.shinjh1253.presentation.ui.search
 
-import android.view.ViewTreeObserver
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.dp
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
@@ -48,6 +28,8 @@ import com.shinjh1253.presentation.model.DocumentUiState
 import com.shinjh1253.presentation.model.SearchUiState
 import com.shinjh1253.presentation.model.SearchUiStateProvider
 import com.shinjh1253.presentation.ui.component.VerticalGridContent
+import com.shinjh1253.presentation.ui.component.searchbar.SearchTopBar
+import com.shinjh1253.presentation.ui.component.searchbar.SearchbarUiEvent
 import com.shinjh1253.presentation.ui.theme.ComposeApplicationTheme
 import kotlinx.coroutines.flow.flowOf
 
@@ -76,7 +58,7 @@ fun SearchRoute(
     SearchScreen(
         searchUiState = searchUiState,
         pagingItems = searchResultUiState,
-        onSearchUiEvent = viewModel::dispatchEvent,
+        onSearchbarUiEvent = viewModel::dispatchSearchEvent,
         modifier = Modifier.fillMaxSize()
     )
 }
@@ -85,7 +67,7 @@ fun SearchRoute(
 private fun SearchScreen(
     searchUiState: SearchUiState,
     pagingItems: LazyPagingItems<DocumentUiState>,
-    onSearchUiEvent: (SearchUiEvent) -> Unit,
+    onSearchbarUiEvent: (SearchbarUiEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -94,7 +76,7 @@ private fun SearchScreen(
     ) {
         SearchTopBar(
             searchUiState = searchUiState,
-            onSearchUiEvent = onSearchUiEvent,
+            onSearchbarUiEvent = onSearchbarUiEvent,
         )
 
         SearchResult(
@@ -103,80 +85,6 @@ private fun SearchScreen(
             modifier = Modifier
                 .fillMaxSize()
         )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SearchTopBar(
-    searchUiState: SearchUiState,
-    onSearchUiEvent: (SearchUiEvent) -> Unit,
-    searchActive: MutableState<Boolean> = remember { mutableStateOf(false) },
-) {
-    val focusManager = LocalFocusManager.current
-    val view = LocalView.current
-    val viewTreeObserver = view.viewTreeObserver
-    DisposableEffect(viewTreeObserver) {
-        val listener = ViewTreeObserver.OnGlobalLayoutListener {
-            val isKeyboardOpen = ViewCompat.getRootWindowInsets(view)
-                ?.isVisible(WindowInsetsCompat.Type.ime()) ?: true
-
-            if (!isKeyboardOpen) {
-                focusManager.clearFocus()
-            }
-        }
-
-        viewTreeObserver.addOnGlobalLayoutListener(listener)
-
-        onDispose {
-            viewTreeObserver.removeOnGlobalLayoutListener(listener)
-        }
-    }
-
-    SearchBar(
-        query = searchUiState.query.keyword,
-        onQueryChange = {
-            onSearchUiEvent(SearchUiEvent.OnSearchTextChanged(it))
-        },
-        onSearch = {
-            focusManager.clearFocus()
-            onSearchUiEvent(SearchUiEvent.OnSearch(it))
-        },
-        active = false,
-        onActiveChange = { },
-        placeholder = {
-            Text(text = stringResource(id = R.string.searchbar_hint))
-        },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = stringResource(id = R.string.desc_search)
-            )
-        },
-        trailingIcon = {
-            if (searchActive.value) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = stringResource(id = R.string.desc_clear),
-                    modifier = Modifier.clickable {
-                        if (searchUiState.queryNotEmpty()) {
-                            onSearchUiEvent(SearchUiEvent.OnClearSearchTextClick)
-                        } else {
-                            searchActive.value = false
-                        }
-                    }
-                )
-            }
-        },
-        windowInsets = WindowInsets(
-            top = 0.dp,
-            bottom = 0.dp
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .focusable()
-    ) {
-
     }
 }
 
@@ -243,7 +151,7 @@ fun SearchScreenPreview(
         SearchScreen(
             searchUiState = searchUiState,
             pagingItems = pagingItems,
-            onSearchUiEvent = { },
+            onSearchbarUiEvent = { },
             modifier = Modifier.fillMaxSize()
         )
     }
