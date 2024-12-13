@@ -21,13 +21,13 @@ import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.shinjh1253.presentation.R
-import com.shinjh1253.presentation.core.ui.ErrorScreen
-import com.shinjh1253.presentation.core.ui.LoadingScreen
-import com.shinjh1253.presentation.core.ui.TextScreen
+import com.shinjh1253.presentation.ui.component.ErrorScreen
+import com.shinjh1253.presentation.ui.component.LoadingScreen
+import com.shinjh1253.presentation.ui.component.TextScreen
 import com.shinjh1253.presentation.model.DocumentUiState
 import com.shinjh1253.presentation.model.SearchUiState
 import com.shinjh1253.presentation.model.SearchUiStateProvider
-import com.shinjh1253.presentation.ui.component.VerticalGridContent
+import com.shinjh1253.presentation.ui.component.item.VerticalGridContent
 import com.shinjh1253.presentation.ui.component.searchbar.SearchTopBar
 import com.shinjh1253.presentation.ui.component.searchbar.SearchbarUiEvent
 import com.shinjh1253.presentation.ui.theme.ComposeApplicationTheme

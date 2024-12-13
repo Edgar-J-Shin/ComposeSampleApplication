@@ -1,4 +1,4 @@
-package com.shinjh1253.presentation.ui.component
+package com.shinjh1253.presentation.ui.component.item
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth

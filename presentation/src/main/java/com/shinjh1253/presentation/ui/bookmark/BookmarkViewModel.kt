@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -57,17 +56,14 @@ class BookmarkViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val bookmarkUiState = searchUiState
         .debounce(1000L)
-        .filter { it.queryNotEmpty() }
         .map { it.query.keyword }
         .flatMapLatest { keyword ->
-            getBookmarksUseCase(searchUiState.value.query.keyword)
+            getBookmarksUseCase(keyword)
                 .map { documents ->
                     documents.map { document ->
                         document.toUiState().copy(
                             bookmark = true
-                        ).apply {
-                            onBookmarkClick = ::updateBookmark
-                        }
+                        )
                     }
                 }
         }

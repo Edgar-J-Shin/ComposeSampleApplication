@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface BookmarkDao : BaseDao<DocumentEntity> {
 
+    @Query("SELECT * FROM documents")
+    fun selectAll(): Flow<List<DocumentEntity>>
+
     @Query("SELECT * FROM documents WHERE :keyword == keyword")
     fun selectByKeyword(keyword: String): Flow<List<DocumentEntity>>
 

@@ -1,4 +1,4 @@
-package com.shinjh1253.presentation.core.ui
+package com.shinjh1253.presentation.ui.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

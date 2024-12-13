@@ -20,14 +20,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shinjh1253.presentation.R
-import com.shinjh1253.presentation.core.ui.ErrorScreen
-import com.shinjh1253.presentation.core.ui.LoadingScreen
-import com.shinjh1253.presentation.core.ui.TextScreen
 import com.shinjh1253.presentation.core.ui.UiState
 import com.shinjh1253.presentation.model.BookmarkUiStateProvider
 import com.shinjh1253.presentation.model.DocumentUiState
 import com.shinjh1253.presentation.model.SearchUiState
-import com.shinjh1253.presentation.ui.component.BookmarkItem
+import com.shinjh1253.presentation.ui.component.ErrorScreen
+import com.shinjh1253.presentation.ui.component.LoadingScreen
+import com.shinjh1253.presentation.ui.component.item.BookmarkItem
 import com.shinjh1253.presentation.ui.component.searchbar.SearchTopBar
 import com.shinjh1253.presentation.ui.component.searchbar.SearchbarUiEvent
 import com.shinjh1253.presentation.ui.theme.ComposeApplicationTheme
@@ -79,7 +78,6 @@ private fun BookmarkScreen(
         )
 
         BookmarkSearchResult(
-            isQueryEmpty = { !searchUiState.queryNotEmpty() },
             bookmarkUiState = bookmarkUiState,
             modifier = Modifier
                 .fillMaxSize()
@@ -89,37 +87,32 @@ private fun BookmarkScreen(
 
 @Composable
 fun BookmarkSearchResult(
-    isQueryEmpty: () -> Boolean,
     bookmarkUiState: UiState<List<DocumentUiState>>,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
     ) {
-        if (isQueryEmpty()) {
-            TextScreen(message = stringResource(id = R.string.input_query_message))
-        } else {
-            when (bookmarkUiState) {
-                is UiState.Loading -> {
-                    LoadingScreen()
-                }
+        when (bookmarkUiState) {
+            is UiState.Loading -> {
+                LoadingScreen()
+            }
 
-                is UiState.Error -> {
-                    ErrorScreen(
-                        message = stringResource(id = R.string.api_response_error_message),
+            is UiState.Error -> {
+                ErrorScreen(
+                    message = stringResource(id = R.string.api_response_error_message),
+                )
+            }
+
+            is UiState.Success -> {
+                if (bookmarkUiState.data.isEmpty()) {
+                    ErrorScreen(message = stringResource(id = R.string.empty_bookmarks_message))
+                } else {
+                    BookmarkContents(
+                        bookmarkUiState = bookmarkUiState.data,
+                        modifier = Modifier
+                            .fillMaxSize()
                     )
-                }
-
-                is UiState.Success -> {
-                    if (bookmarkUiState.data.isEmpty()) {
-                        ErrorScreen(message = stringResource(id = R.string.empty_bookmarks_message))
-                    } else {
-                        BookmarkContents(
-                            bookmarkUiState = bookmarkUiState.data,
-                            modifier = Modifier
-                                .fillMaxSize()
-                        )
-                    }
                 }
             }
         }

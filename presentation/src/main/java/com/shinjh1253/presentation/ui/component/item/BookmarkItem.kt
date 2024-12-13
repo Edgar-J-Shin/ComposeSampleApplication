@@ -1,4 +1,4 @@
-package com.shinjh1253.presentation.ui.component
+package com.shinjh1253.presentation.ui.component.item
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,8 +18,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.shinjh1253.presentation.core.ui.BasicImage
 import com.shinjh1253.presentation.model.DocumentUiState
+import com.shinjh1253.presentation.ui.component.image.BasicImage
 
 @Composable
 fun BookmarkItem(

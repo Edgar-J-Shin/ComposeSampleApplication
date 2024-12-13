@@ -1,8 +1,11 @@
-package com.shinjh1253.presentation.core.ui
+package com.shinjh1253.presentation.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,13 +15,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.shinjh1253.presentation.R
 
 @Composable
-fun TextScreen(
+fun ErrorScreen(
     modifier: Modifier = Modifier,
     message: String = "",
     textStyle: TextStyle = MaterialTheme.typography.titleLarge,
+    primaryButton: (@Composable () -> Unit)? = null,
 ) {
     Column(
         modifier = modifier
@@ -31,13 +36,25 @@ fun TextScreen(
             textAlign = TextAlign.Center,
             style = textStyle
         )
+        primaryButton?.let {
+            Spacer(modifier = Modifier.height(15.dp))
+            it.invoke()
+        }
     }
 }
 
-@Preview(name = "TextScreen", showBackground = true)
+@Preview(name = "ErrorScreen", showBackground = true)
 @Composable
-fun TextScreenPreview() {
-    TextScreen(
-        message = stringResource(id = R.string.input_query_message),
+fun ErrorScreenPreview() {
+    ErrorScreen(
+        message = stringResource(id = R.string.api_response_error_message),
+        primaryButton = {
+            Button(
+                onClick = {},
+                modifier = Modifier
+            ) {
+                Text(text = stringResource(id = R.string.retry))
+            }
+        }
     )
 }
