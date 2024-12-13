@@ -17,9 +17,7 @@ fun Document.toUiState(
         width = width,
         bookmark = bookmark,
         isSelected = false,
-    ).apply {
-        this.onBookmarkClick = onBookmarkClick
-    }
+    )
 
 fun DocumentUiState.toEntity(): Document =
     Document(

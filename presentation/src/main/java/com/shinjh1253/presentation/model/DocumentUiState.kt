@@ -15,9 +15,7 @@ data class DocumentUiState(
     val width: Int,
     val bookmark: Boolean,
     val isSelected: Boolean
-) {
-    var onBookmarkClick: ((DocumentUiState, Boolean) -> Unit)? = null
-}
+)
 
 class BookmarkItemUiStateProvider :
     PreviewParameterProvider<Pair<Boolean, DocumentUiState>> {

@@ -30,10 +30,10 @@ import com.shinjh1253.presentation.ui.component.image.BasicImage
 fun ContentItem(
     documentUiState: DocumentUiState,
     modifier: Modifier = Modifier,
+    onBookmarkClick: ((DocumentUiState, Boolean) -> Unit) = { _, _ -> }
 ) {
     Column(
         modifier = modifier
-            .fillMaxWidth()
             .padding(all = 4.dp)
     ) {
         Box(
@@ -59,10 +59,7 @@ fun ContentItem(
                     .padding(all = 4.dp)
                     .align(Alignment.TopEnd)
                     .clickable {
-                        documentUiState.onBookmarkClick?.invoke(
-                            documentUiState,
-                            !documentUiState.bookmark
-                        )
+                        onBookmarkClick(documentUiState, !documentUiState.bookmark)
                     }
             )
         }
