@@ -10,8 +10,10 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,6 +28,20 @@ fun BookmarkRoute(
     viewModel: BookmarkViewModel = hiltViewModel(),
     showSnackBar: (String, SnackbarDuration) -> Unit = { _, _ -> },
 ) {
+    val context = LocalContext.current
+    LaunchedEffect(key1 = viewModel.uiEffect) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is BookmarkUiEffect.ShowSnackbar -> {
+                    showSnackBar(
+                        effect.state.getMessage(context),
+                        effect.state.duration
+                    )
+                }
+            }
+        }
+    }
+
     val bookmarkUiState by viewModel.bookmarkUiState.collectAsStateWithLifecycle()
 
     BookmarkScreen(

@@ -72,18 +72,13 @@ fun SearchRoute(
             when (effect) {
                 is SearchUiEffect.ShowSnackbar -> {
                     showSnackBar(
-                        context.getString(effect.state.messageResId),
+                        effect.state.getMessage(context),
                         effect.state.duration
                     )
-                }
-
-                is SearchUiEffect.ErrorMessage -> {
-//                    showErrorMessage(effect.message)
                 }
             }
         }
     }
-
 
     val searchUiState by viewModel.searchUiState.collectAsStateWithLifecycle()
     val searchResultUiState = viewModel.searchResultUiState.collectAsLazyPagingItems()
@@ -153,10 +148,11 @@ private fun SearchTopBar(
             onSearchUiEvent(SearchUiEvent.OnSearchTextChanged(it))
         },
         onSearch = {
+            focusManager.clearFocus()
             onSearchUiEvent(SearchUiEvent.OnSearch(it))
         },
         active = false,
-        onActiveChange = { /*onSearchActiveChange(it)*/ },
+        onActiveChange = { },
         placeholder = {
             Text(text = stringResource(id = R.string.searchbar_hint))
         },

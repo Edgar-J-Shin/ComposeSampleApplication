@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.shinjh1253.domain.usecase.GetBookmarksUseCase
 import com.shinjh1253.domain.usecase.GetKeywordUseCase
 import com.shinjh1253.domain.usecase.UpdateBookmarkUseCase
+import com.shinjh1253.presentation.core.state.SnackbarState
 import com.shinjh1253.presentation.core.ui.EventDelegate
 import com.shinjh1253.presentation.model.DocumentUiState
 import com.shinjh1253.presentation.model.mapper.toEntity
@@ -31,7 +32,13 @@ class BookmarkViewModel @Inject constructor(
     private val coroutineExceptionHandler =
         CoroutineExceptionHandler { _, exception ->
             viewModelScope.launch {
-                emitUiEffect(BookmarkUiEffect.ErrorMessage(exception.message ?: "Unknown Error"))
+                emitUiEffect(
+                    BookmarkUiEffect.ShowSnackbar(
+                        state = SnackbarState.ErrorMessage(
+                            errorMsg = exception.message ?: "Unknown Error"
+                        )
+                    )
+                )
             }
         }
 

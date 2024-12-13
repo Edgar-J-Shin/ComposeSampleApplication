@@ -46,7 +46,13 @@ class SearchViewModel @Inject constructor(
     private val coroutineExceptionHandler =
         CoroutineExceptionHandler { _, exception ->
             viewModelScope.launch {
-                emitUiEffect(SearchUiEffect.ErrorMessage(exception.message ?: "Unknown Error"))
+                emitUiEffect(
+                    SearchUiEffect.ShowSnackbar(
+                        state = SnackbarState.ErrorMessage(
+                            errorMsg = exception.message ?: "Unknown Error"
+                        )
+                    )
+                )
             }
         }
 
@@ -100,7 +106,10 @@ class SearchViewModel @Inject constructor(
     private fun search(query: String) {
         viewModelScope.launch {
             if (query.isEmpty()) {
-                emitUiEffect(SearchUiEffect.ShowSnackbar(state = SnackbarState.SearchQueryEmptyError))
+                emitUiEffect(SearchUiEffect.ShowSnackbar(state = SnackbarState.EmptyQueryErrorMessage))
+                clearSearchText()
+            } else {
+                changeSearchText(query)
             }
         }
     }
