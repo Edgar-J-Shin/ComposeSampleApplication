@@ -4,7 +4,7 @@ import com.shinjh1253.data.local.model.DocumentEntity
 import com.shinjh1253.data.local.model.LocalDocument
 import com.shinjh1253.domain.model.Document
 
-fun LocalDocument.toDto(keyword: String): DocumentEntity =
+fun LocalDocument.toDto(keyword: String = ""): DocumentEntity =
     DocumentEntity(
         collection = collection,
         datetime = datetime,

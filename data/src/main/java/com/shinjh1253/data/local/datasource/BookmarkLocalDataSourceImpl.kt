@@ -30,4 +30,10 @@ class BookmarkLocalDataSourceImpl
 
     override suspend fun removeBookmark(keyword: String, document: LocalDocument) =
         bookmarkDao.deleteByKeywordAndImageUrl(keyword, document.imageUrl)
+
+    override suspend fun removeBookmarks(bookmarks: List<LocalDocument>) {
+        for (bookmark in bookmarks) {
+            bookmarkDao.deleteByImageUrl(bookmark.imageUrl)
+        }
+    }
 }

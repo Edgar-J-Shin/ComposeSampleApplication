@@ -3,12 +3,13 @@ package com.shinjh1253.data.local.model
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.time.LocalDateTime
 
 @Entity(tableName = "documents", indices = [Index(value = ["imageUrl"], unique = true)])
 data class DocumentEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val collection: String,
-    val datetime: String,
+    val datetime: LocalDateTime,
     val displaySitename: String,
     val docUrl: String,
     val height: Int,
