@@ -13,7 +13,7 @@ import com.shinjh1253.presentation.R
 fun BasicImage(
     imageUrl: String,
     modifier: Modifier = Modifier,
-    contentDescription: String = stringResource(id = R.string.image_content_description),
+    contentDescription: String = stringResource(id = R.string.desc_image),
     placeHolder: Painter? = painterResource(id = R.drawable.img_placeholder),
     error: Painter? = painterResource(id = R.drawable.img_placeholder),
     contentScale: ContentScale = ContentScale.Crop,
