@@ -1,7 +1,9 @@
 package com.shinjh1253.data.remote.model
 
+import com.shinjh1253.data.remote.LocalDateTimeSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.time.LocalDateTime
 
 @Serializable
 data class GetImageResponse(
@@ -12,7 +14,8 @@ data class GetImageResponse(
 @Serializable
 data class RemoteDocument(
     val collection: String,
-    val datetime: String,
+    @Serializable(with = LocalDateTimeSerializer::class)
+    val datetime: LocalDateTime,
     @SerialName("display_sitename")
     val displaySitename: String,
     @SerialName("doc_url")

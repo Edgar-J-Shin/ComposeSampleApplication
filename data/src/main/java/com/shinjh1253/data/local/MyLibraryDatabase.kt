@@ -14,7 +14,7 @@ import com.shinjh1253.data.local.model.DocumentEntity
     exportSchema = false
 )
 @TypeConverters(
-    value = []
+    value = [LocalDateTimeConverter::class]
 )
 abstract class MyLibraryDatabase : RoomDatabase() {
 

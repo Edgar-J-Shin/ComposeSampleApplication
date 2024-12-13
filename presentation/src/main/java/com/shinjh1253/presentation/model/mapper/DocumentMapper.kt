@@ -15,10 +15,9 @@ fun Document.toUiState(
         imageUrl = imageUrl,
         thumbnailUrl = thumbnailUrl,
         width = width,
-        bookmark = bookmark
-    ).apply {
-        this.onBookmarkClick = onBookmarkClick
-    }
+        bookmark = bookmark,
+        isSelected = false,
+    )
 
 fun DocumentUiState.toEntity(): Document =
     Document(

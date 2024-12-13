@@ -1,4 +1,4 @@
-package com.shinjh1253.presentation.core.ui
+package com.shinjh1253.presentation.ui.component.image
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

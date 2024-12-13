@@ -3,7 +3,7 @@ package com.shinjh1253.presentation.ui.bookmark
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shinjh1253.domain.usecase.GetBookmarksUseCase
-import com.shinjh1253.domain.usecase.UpdateBookmarkUseCase
+import com.shinjh1253.domain.usecase.RemoveBookmarksUseCase
 import com.shinjh1253.presentation.core.state.SnackbarState
 import com.shinjh1253.presentation.core.ui.EventDelegate
 import com.shinjh1253.presentation.core.ui.UiState
@@ -21,8 +21,8 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -33,7 +33,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BookmarkViewModel @Inject constructor(
     getBookmarksUseCase: GetBookmarksUseCase,
-    private val updateBookmarkUseCase: UpdateBookmarkUseCase,
+    private val removeBookmarksUseCase: RemoveBookmarksUseCase,
 ) :
     ViewModel(),
     EventDelegate<BookmarkUiEffect, BookmarkUiEvent> by EventDelegate.EventDelegateImpl() {
@@ -51,25 +51,34 @@ class BookmarkViewModel @Inject constructor(
             }
         }
 
+    private val _selectedBookmarks: MutableStateFlow<List<DocumentUiState>> =
+        MutableStateFlow(emptyList())
+    val selectedBookmarks = _selectedBookmarks.asStateFlow()
+
+    private val _totalCount = MutableStateFlow(0)
+    val totalCount = _totalCount.asStateFlow()
+
+    private val _editModeUiState = MutableStateFlow(false)
+    val editModeUiState = _editModeUiState.asStateFlow()
+
     private val _searchUiState = MutableStateFlow(SearchUiState.Empty)
     val searchUiState = _searchUiState.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val bookmarkUiState = searchUiState
         .debounce(1000L)
-        .filter { it.queryNotEmpty() }
         .map { it.query.keyword }
         .flatMapLatest { keyword ->
-            getBookmarksUseCase(searchUiState.value.query.keyword)
-                .map { documents ->
-                    documents.map { document ->
-                        document.toUiState().copy(
-                            bookmark = true
-                        ).apply {
-                            onBookmarkClick = ::updateBookmark
-                        }
-                    }
+            getBookmarksUseCase(keyword).combine(selectedBookmarks) { documents, selectedBookmarks ->
+                _totalCount.emit(documents.size)
+
+                documents.map { document ->
+                    document.toUiState().copy(
+                        bookmark = true,
+                        isSelected = selectedBookmarks.find { it.imageUrl == document.imageUrl } != null
+                    )
                 }
+            }
         }
         .asUiState()
         .stateIn(
@@ -78,16 +87,9 @@ class BookmarkViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000)
         )
 
-    private fun updateBookmark(
-        documentUiState: DocumentUiState,
-        isBookmarked: Boolean,
-    ) {
-        viewModelScope.launch(coroutineExceptionHandler) {
-            updateBookmarkUseCase(
-                keyword = searchUiState.value.query.keyword,
-                document = documentUiState.toEntity(),
-                isBookmarked = isBookmarked,
-            )
+    private fun clearSelectedBookmarks() {
+        viewModelScope.launch {
+            _selectedBookmarks.emit(emptyList())
         }
     }
 
@@ -122,6 +124,34 @@ class BookmarkViewModel @Inject constructor(
 
             is SearchbarUiEvent.OnSearch -> {
                 search(event.keyword)
+            }
+        }
+    }
+
+    fun changeEditMode(editMode: Boolean) {
+        viewModelScope.launch {
+            _editModeUiState.emit(editMode)
+        }
+    }
+
+    fun removeBookmarks() {
+        viewModelScope.launch {
+            removeBookmarksUseCase(
+                bookmarks = selectedBookmarks.value.map { it.toEntity() })
+                .collect {
+                    clearSelectedBookmarks()
+                    changeEditMode(false)
+                }
+        }
+    }
+
+    fun changeBookmarkChecked(documentUiState: DocumentUiState, check: Boolean) {
+        viewModelScope.launch {
+            if (check) {
+                _selectedBookmarks.emit(_selectedBookmarks.value + documentUiState)
+            } else {
+                _selectedBookmarks.emit(_selectedBookmarks.value.filter { it.imageUrl != documentUiState.imageUrl })
+
             }
         }
     }

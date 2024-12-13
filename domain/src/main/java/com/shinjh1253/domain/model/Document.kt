@@ -1,8 +1,10 @@
 package com.shinjh1253.domain.model
 
+import java.time.LocalDateTime
+
 data class Document(
     val collection: String,
-    val datetime: String,
+    val datetime: LocalDateTime,
     val displaySitename: String,
     val docUrl: String,
     val height: Int,

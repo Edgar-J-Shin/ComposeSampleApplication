@@ -9,4 +9,6 @@ interface BookmarkLocalDataSource {
     suspend fun addBookmark(keyword: String, document: LocalDocument): Long
 
     suspend fun removeBookmark(keyword: String, document: LocalDocument): Unit
+
+    suspend fun removeBookmarks(documents: List<LocalDocument>)
 }

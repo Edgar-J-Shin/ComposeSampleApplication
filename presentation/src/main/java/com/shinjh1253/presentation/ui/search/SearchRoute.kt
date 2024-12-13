@@ -2,7 +2,12 @@ package com.shinjh1253.presentation.ui.search
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.Button
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
@@ -11,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -20,14 +26,15 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.shinjh1253.presentation.R
-import com.shinjh1253.presentation.core.ui.ErrorScreen
-import com.shinjh1253.presentation.core.ui.LoadingScreen
-import com.shinjh1253.presentation.core.ui.TextScreen
 import com.shinjh1253.presentation.model.DocumentUiState
 import com.shinjh1253.presentation.model.SearchUiState
 import com.shinjh1253.presentation.model.SearchUiStateProvider
-import com.shinjh1253.presentation.ui.component.VerticalGridContent
+import com.shinjh1253.presentation.ui.component.ErrorScreen
+import com.shinjh1253.presentation.ui.component.LoadingScreen
+import com.shinjh1253.presentation.ui.component.TextScreen
+import com.shinjh1253.presentation.ui.component.item.ContentItem
 import com.shinjh1253.presentation.ui.component.searchbar.SearchTopBar
 import com.shinjh1253.presentation.ui.component.searchbar.SearchbarUiEvent
 import com.shinjh1253.presentation.ui.theme.ComposeApplicationTheme
@@ -59,7 +66,8 @@ fun SearchRoute(
         searchUiState = searchUiState,
         pagingItems = searchResultUiState,
         onSearchbarUiEvent = viewModel::dispatchSearchEvent,
-        modifier = Modifier.fillMaxSize()
+        onBookmarkClick = viewModel::updateBookmark,
+        modifier = Modifier.fillMaxSize(),
     )
 }
 
@@ -67,8 +75,9 @@ fun SearchRoute(
 private fun SearchScreen(
     searchUiState: SearchUiState,
     pagingItems: LazyPagingItems<DocumentUiState>,
-    onSearchbarUiEvent: (SearchbarUiEvent) -> Unit,
     modifier: Modifier = Modifier,
+    onSearchbarUiEvent: (SearchbarUiEvent) -> Unit = { _ -> },
+    onBookmarkClick: ((DocumentUiState, Boolean) -> Unit) = { _, _ -> }
 ) {
     Column(
         modifier = modifier
@@ -82,6 +91,7 @@ private fun SearchScreen(
         SearchResult(
             isQueryEmpty = { !searchUiState.queryNotEmpty() },
             pagingItems = pagingItems,
+            onBookmarkClick = onBookmarkClick,
             modifier = Modifier
                 .fillMaxSize()
         )
@@ -92,7 +102,8 @@ private fun SearchScreen(
 fun SearchResult(
     isQueryEmpty: () -> Boolean,
     pagingItems: LazyPagingItems<DocumentUiState>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBookmarkClick: ((DocumentUiState, Boolean) -> Unit) = { _, _ -> },
 ) {
     Box(
         modifier = modifier
@@ -130,10 +141,45 @@ fun SearchResult(
                 isNotLoading -> {
                     VerticalGridContent(
                         pagingItems = pagingItems,
+                        onBookmarkClick = onBookmarkClick,
                         modifier = Modifier
-                            .fillMaxSize()
+                            .fillMaxSize(),
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun VerticalGridContent(
+    pagingItems: LazyPagingItems<DocumentUiState>,
+    modifier: Modifier = Modifier,
+    onBookmarkClick: ((DocumentUiState, Boolean) -> Unit) = { _, _ -> },
+) {
+    val gridState = rememberLazyGridState()
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        state = gridState,
+
+        contentPadding = PaddingValues(
+            horizontal = dimensionResource(id = R.dimen.list_margin_horizontal),
+            vertical = dimensionResource(id = R.dimen.list_margin_vertical)
+        ),
+        modifier = modifier
+    ) {
+        items(
+            count = pagingItems.itemCount,
+            key = pagingItems.itemKey { it.imageUrl }
+        ) { index ->
+            pagingItems[index]?.let { documentUiState ->
+                ContentItem(
+                    documentUiState = documentUiState,
+                    onBookmarkClick = onBookmarkClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
             }
         }
     }

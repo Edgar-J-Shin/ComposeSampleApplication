@@ -8,6 +8,7 @@ import com.shinjh1253.domain.model.Document
 import com.shinjh1253.domain.repository.BookmarkRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -39,4 +40,11 @@ constructor(
                 keyword = keyword,
                 document = document.toLocal()
             )
+
+    override fun removeBookmarks(bookmarks: List<Document>) = flow {
+        bookmarkLocalDataSource
+            .removeBookmarks(bookmarks.map { it.toLocal() })
+
+        emit(Unit)
+    }.flowOn(ioDispatcher)
 }

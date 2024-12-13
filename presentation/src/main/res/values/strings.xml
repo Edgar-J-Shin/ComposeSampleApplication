@@ -10,10 +10,17 @@
     <string name="desc_clear">clear</string>
     <string name="desc_bookmark">bookmark</string>
     <string name="desc_image">image</string>
+    <string name="desc_edit_mode">edit mode</string>
+    <string name="desc_close">close</string>
 
     <string name="empty_query_message">empty query</string>
     <string name="api_response_error_message">Could not load data!</string>
     <string name="input_query_message">Input query text!</string>
     <string name="empty_search_result_message">Empty search result!</string>
     <string name="empty_bookmarks_message">Empty bookmarks!</string>
+
+    <string name="selected_count">selected(%d)</string>
+    <string name="total_count">total(%d)</string>
+    <string name="site_name">Site Name : %s</string>
+    <string name="datetime">"Date : %s "</string>
 </resources>

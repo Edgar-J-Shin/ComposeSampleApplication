@@ -13,8 +13,16 @@ class BookmarkLocalDataSourceImpl
     private val bookmarkDao: BookmarkDao
 ) : BookmarkLocalDataSource {
     override fun getBookmarks(keyword: String): Flow<List<LocalDocument>> =
-        bookmarkDao.selectByKeyword(keyword)
-            .map { documents -> documents.map { document -> document.toLocal() } }
+        if (keyword.isEmpty()) {
+            bookmarkDao.selectAll()
+        } else {
+            bookmarkDao.selectByKeyword(keyword)
+        }
+            .map { documents ->
+                documents
+                    .distinctBy { document -> document.imageUrl }
+                    .map { document -> document.toLocal() }
+            }
 
 
     override suspend fun addBookmark(keyword: String, document: LocalDocument): Long =
@@ -22,4 +30,10 @@ class BookmarkLocalDataSourceImpl
 
     override suspend fun removeBookmark(keyword: String, document: LocalDocument) =
         bookmarkDao.deleteByKeywordAndImageUrl(keyword, document.imageUrl)
+
+    override suspend fun removeBookmarks(documents: List<LocalDocument>) {
+        for (document in documents) {
+            bookmarkDao.deleteByImageUrl(document.imageUrl)
+        }
+    }
 }

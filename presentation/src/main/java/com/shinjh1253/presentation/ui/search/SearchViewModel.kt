@@ -78,9 +78,7 @@ class SearchViewModel @Inject constructor(
                             bookmark = bookmarks.any { bookmark ->
                                 bookmark.imageUrl == documentUiState.imageUrl
                             }
-                        ).apply {
-                            onBookmarkClick = ::updateBookmark
-                        }
+                        )
                     }
                 }
         }
@@ -109,7 +107,7 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun updateBookmark(
+    fun updateBookmark(
         documentUiState: DocumentUiState,
         isBookmarked: Boolean,
     ) {

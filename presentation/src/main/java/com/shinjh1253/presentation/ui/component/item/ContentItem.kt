@@ -1,4 +1,4 @@
-package com.shinjh1253.presentation.ui.component
+package com.shinjh1253.presentation.ui.component.item
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -23,17 +23,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shinjh1253.presentation.R
-import com.shinjh1253.presentation.core.ui.BasicImage
 import com.shinjh1253.presentation.model.DocumentUiState
+import com.shinjh1253.presentation.ui.component.image.BasicImage
 
 @Composable
 fun ContentItem(
     documentUiState: DocumentUiState,
     modifier: Modifier = Modifier,
+    onBookmarkClick: ((DocumentUiState, Boolean) -> Unit) = { _, _ -> }
 ) {
     Column(
         modifier = modifier
-            .fillMaxWidth()
             .padding(all = 4.dp)
     ) {
         Box(
@@ -59,10 +59,7 @@ fun ContentItem(
                     .padding(all = 4.dp)
                     .align(Alignment.TopEnd)
                     .clickable {
-                        documentUiState.onBookmarkClick?.invoke(
-                            documentUiState,
-                            !documentUiState.bookmark
-                        )
+                        onBookmarkClick(documentUiState, !documentUiState.bookmark)
                     }
             )
         }
