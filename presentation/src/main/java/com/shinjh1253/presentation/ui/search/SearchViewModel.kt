@@ -25,12 +25,13 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -62,32 +63,30 @@ class SearchViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val searchResultUiState = searchUiState
         .debounce(1000L)
-        .flatMapLatest {
-            updateKeywordUseCase(it.query.keyword)
+        .filter { it.queryNotEmpty() }
+        .map { it.query.keyword }
+        .flatMapLatest { keyword ->
+            updateKeywordUseCase(keyword)
 
-            if (it.queryNotEmpty()) {
-                getImagesUseCase(it.query.keyword)
-                    .map { pagingData ->
-                        pagingData.map { document ->
-                            document.toUiState()
-                        }
+            getImagesUseCase(keyword)
+                .map { pagingData ->
+                    pagingData.map { document ->
+                        document.toUiState()
                     }
-                    .cachedIn(viewModelScope)
-                    .combine(getBookmarksUseCase(it.query.keyword)) { pagingData, bookmarks ->
-                        // 북마크 적용
-                        pagingData.map { documentUiState ->
-                            documentUiState.copy(
-                                bookmark = bookmarks.any { bookmark ->
-                                    bookmark.imageUrl == documentUiState.imageUrl
-                                }
-                            ).apply {
-                                onBookmarkClick = ::updateBookmark
+                }
+                .cachedIn(viewModelScope)
+                .combine(getBookmarksUseCase(keyword)) { pagingData, bookmarks ->
+                    // 북마크 적용
+                    pagingData.map { documentUiState ->
+                        documentUiState.copy(
+                            bookmark = bookmarks.any { bookmark ->
+                                bookmark.imageUrl == documentUiState.imageUrl
                             }
+                        ).apply {
+                            onBookmarkClick = ::updateBookmark
                         }
                     }
-            } else {
-                flowOf(PagingData.empty())
-            }
+                }
         }
         .stateIn(
             scope = viewModelScope,
@@ -95,7 +94,7 @@ class SearchViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000)
         )
 
-    private fun changeSearchText(newText: String) {
+    private fun updateSearchText(newText: String) {
         _searchUiState.update { it.copy(query = KeywordUiState(newText)) }
     }
 
@@ -109,7 +108,7 @@ class SearchViewModel @Inject constructor(
                 emitUiEffect(SearchUiEffect.ShowSnackbar(state = SnackbarState.EmptyQueryErrorMessage))
                 clearSearchText()
             } else {
-                changeSearchText(query)
+                updateSearchText(query)
             }
         }
     }
@@ -130,7 +129,7 @@ class SearchViewModel @Inject constructor(
     override fun dispatchEvent(event: SearchUiEvent) {
         when (event) {
             is SearchUiEvent.OnSearchTextChanged -> {
-                changeSearchText(event.query)
+                updateSearchText(event.query)
             }
 
             is SearchUiEvent.OnClearSearchTextClick -> {

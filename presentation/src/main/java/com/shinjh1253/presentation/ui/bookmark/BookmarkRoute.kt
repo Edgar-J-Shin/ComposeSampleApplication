@@ -77,7 +77,7 @@ private fun BookmarkScreen(
 
             is UiState.Success -> {
                 if (bookmarkUiState.data.isEmpty()) {
-                    ErrorScreen(message = stringResource(id = R.string.empty_content_list_message))
+                    ErrorScreen(message = stringResource(id = R.string.empty_bookmarks_message))
                 } else {
                     VerticalGridBookmarkContent(
                         bookmarkUiState = bookmarkUiState.data,

@@ -35,13 +35,23 @@ class SearchUiStateProvider :
     )
 
     /**
-     * 1. Loading
-     * 2. Error
-     * 3. Empty Data
-     * 4. Data
+     * 1. Init
+     * 2. Loading
+     * 3. Error
+     * 4. Empty Data
+     * 5. Data
      */
     override val values: Sequence<Pair<SearchUiState, PagingData<DocumentUiState>>>
         get() = sequenceOf(
+            SearchUiState(query = KeywordUiState("")) to
+                    PagingData.from(
+                        data = emptyList(),
+                        sourceLoadStates = LoadStates(
+                            refresh = LoadState.Loading,
+                            prepend = LoadState.NotLoading(false),
+                            append = LoadState.NotLoading(false),
+                        )
+                    ),
             SearchUiState(query = KeywordUiState("test1")) to
                     PagingData.from(
                         data = emptyList(),

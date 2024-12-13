@@ -16,7 +16,7 @@ sealed class SnackbarState(
         SnackbarState(message = errorMsg)
 
     data object EmptyQueryErrorMessage :
-        SnackbarState(messageResId = R.string.search_query_empty_error)
+        SnackbarState(messageResId = R.string.empty_query_message)
 
     fun getMessage(context: Context): String = if (messageResId != -1) {
         context.getString(messageResId)

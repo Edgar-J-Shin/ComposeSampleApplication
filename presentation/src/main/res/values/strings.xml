@@ -4,12 +4,16 @@
     <string name="search">search</string>
     <string name="bookmark">bookmark</string>
     <string name="searchbar_hint">query</string>
+    <string name="retry">retry</string>
+
     <string name="desc_search">search</string>
     <string name="desc_clear">clear</string>
-    <string name="search_query_empty_error">empty query</string>
-    <string name="api_response_error_message">Could not load data!</string>
-    <string name="retry">retry</string>
-    <string name="empty_content_list_message">Empty contents!</string>
-    <string name="image_content_description">image</string>
     <string name="desc_bookmark">bookmark</string>
+    <string name="desc_image">image</string>
+
+    <string name="empty_query_message">empty query</string>
+    <string name="api_response_error_message">Could not load data!</string>
+    <string name="input_query_message">Input query text!</string>
+    <string name="empty_search_result_message">Empty search result!</string>
+    <string name="empty_bookmarks_message">Empty bookmarks!</string>
 </resources>

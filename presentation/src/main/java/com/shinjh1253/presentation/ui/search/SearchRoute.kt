@@ -43,6 +43,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.shinjh1253.presentation.R
 import com.shinjh1253.presentation.core.ui.ErrorScreen
 import com.shinjh1253.presentation.core.ui.LoadingScreen
+import com.shinjh1253.presentation.core.ui.TextScreen
 import com.shinjh1253.presentation.model.DocumentUiState
 import com.shinjh1253.presentation.model.SearchUiState
 import com.shinjh1253.presentation.model.SearchUiStateProvider
@@ -97,6 +98,7 @@ private fun SearchScreen(
         )
 
         SearchResult(
+            isQueryEmpty = { !searchUiState.queryNotEmpty() },
             pagingItems = pagingItems,
             modifier = Modifier
                 .fillMaxSize()
@@ -180,6 +182,7 @@ private fun SearchTopBar(
 
 @Composable
 fun SearchResult(
+    isQueryEmpty: () -> Boolean,
     pagingItems: LazyPagingItems<DocumentUiState>,
     modifier: Modifier = Modifier
 ) {
@@ -191,34 +194,38 @@ fun SearchResult(
         val isError = pagingItems.loadState.refresh is LoadState.Error
         val isEmpty = pagingItems.itemCount == 0
 
-        when {
-            isLoading -> {
-                LoadingScreen()
-            }
+        if (isQueryEmpty()) {
+            TextScreen(message = stringResource(id = R.string.input_query_message))
+        } else {
+            when {
+                isLoading -> {
+                    LoadingScreen()
+                }
 
-            isError -> {
-                ErrorScreen(
-                    message = stringResource(id = R.string.api_response_error_message),
-                    primaryButton = {
-                        Button(
-                            onClick = pagingItems::retry
-                        ) {
-                            Text(text = stringResource(id = R.string.retry))
-                        }
-                    },
-                )
-            }
+                isError -> {
+                    ErrorScreen(
+                        message = stringResource(id = R.string.api_response_error_message),
+                        primaryButton = {
+                            Button(
+                                onClick = pagingItems::retry
+                            ) {
+                                Text(text = stringResource(id = R.string.retry))
+                            }
+                        },
+                    )
+                }
 
-            isEmpty -> {
-                ErrorScreen(message = stringResource(id = R.string.empty_content_list_message))
-            }
+                isEmpty -> {
+                    ErrorScreen(message = stringResource(id = R.string.empty_search_result_message))
+                }
 
-            isNotLoading -> {
-                VerticalGridContent(
-                    pagingItems = pagingItems,
-                    modifier = Modifier
-                        .fillMaxSize()
-                )
+                isNotLoading -> {
+                    VerticalGridContent(
+                        pagingItems = pagingItems,
+                        modifier = Modifier
+                            .fillMaxSize()
+                    )
+                }
             }
         }
     }
