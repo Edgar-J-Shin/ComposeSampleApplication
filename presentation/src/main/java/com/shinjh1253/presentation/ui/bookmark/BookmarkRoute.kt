@@ -1,13 +1,12 @@
 package com.shinjh1253.presentation.ui.bookmark
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,10 +22,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shinjh1253.presentation.R
 import com.shinjh1253.presentation.core.ui.ErrorScreen
 import com.shinjh1253.presentation.core.ui.LoadingScreen
+import com.shinjh1253.presentation.core.ui.TextScreen
 import com.shinjh1253.presentation.core.ui.UiState
 import com.shinjh1253.presentation.model.BookmarkUiStateProvider
 import com.shinjh1253.presentation.model.DocumentUiState
-import com.shinjh1253.presentation.ui.component.ContentItem
+import com.shinjh1253.presentation.model.SearchUiState
+import com.shinjh1253.presentation.ui.component.BookmarkItem
+import com.shinjh1253.presentation.ui.component.searchbar.SearchTopBar
+import com.shinjh1253.presentation.ui.component.searchbar.SearchbarUiEvent
 import com.shinjh1253.presentation.ui.theme.ComposeApplicationTheme
 
 @Composable
@@ -48,42 +51,75 @@ fun BookmarkRoute(
         }
     }
 
+    val searchUiState by viewModel.searchUiState.collectAsStateWithLifecycle()
     val bookmarkUiState by viewModel.bookmarkUiState.collectAsStateWithLifecycle()
 
     BookmarkScreen(
-        bookmarkUiState,
+        searchUiState = searchUiState,
+        bookmarkUiState = bookmarkUiState,
+        onSearchbarUiEvent = viewModel::dispatchSearchEvent,
         modifier = Modifier.fillMaxSize()
     )
 }
 
 @Composable
 private fun BookmarkScreen(
+    searchUiState: SearchUiState,
+    bookmarkUiState: UiState<List<DocumentUiState>>,
+    onSearchbarUiEvent: (SearchbarUiEvent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize(),
+    ) {
+        SearchTopBar(
+            searchUiState = searchUiState,
+            onSearchbarUiEvent = onSearchbarUiEvent,
+        )
+
+        BookmarkSearchResult(
+            isQueryEmpty = { !searchUiState.queryNotEmpty() },
+            bookmarkUiState = bookmarkUiState,
+            modifier = Modifier
+                .fillMaxSize()
+        )
+    }
+}
+
+@Composable
+fun BookmarkSearchResult(
+    isQueryEmpty: () -> Boolean,
     bookmarkUiState: UiState<List<DocumentUiState>>,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
     ) {
-        when (bookmarkUiState) {
-            is UiState.Loading -> {
-                LoadingScreen()
-            }
+        if (isQueryEmpty()) {
+            TextScreen(message = stringResource(id = R.string.input_query_message))
+        } else {
+            when (bookmarkUiState) {
+                is UiState.Loading -> {
+                    LoadingScreen()
+                }
 
-            is UiState.Error -> {
-                ErrorScreen(
-                    message = stringResource(id = R.string.api_response_error_message),
-                )
-            }
-
-            is UiState.Success -> {
-                if (bookmarkUiState.data.isEmpty()) {
-                    ErrorScreen(message = stringResource(id = R.string.empty_bookmarks_message))
-                } else {
-                    VerticalGridBookmarkContent(
-                        bookmarkUiState = bookmarkUiState.data,
-                        modifier = Modifier
-                            .fillMaxSize()
+                is UiState.Error -> {
+                    ErrorScreen(
+                        message = stringResource(id = R.string.api_response_error_message),
                     )
+                }
+
+                is UiState.Success -> {
+                    if (bookmarkUiState.data.isEmpty()) {
+                        ErrorScreen(message = stringResource(id = R.string.empty_bookmarks_message))
+                    } else {
+                        BookmarkContents(
+                            bookmarkUiState = bookmarkUiState.data,
+                            modifier = Modifier
+                                .fillMaxSize()
+                        )
+                    }
                 }
             }
         }
@@ -91,16 +127,11 @@ private fun BookmarkScreen(
 }
 
 @Composable
-fun VerticalGridBookmarkContent(
+fun BookmarkContents(
     bookmarkUiState: List<DocumentUiState>,
     modifier: Modifier = Modifier,
 ) {
-    val gridState = rememberLazyGridState()
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        state = gridState,
-
+    LazyColumn(
         contentPadding = PaddingValues(
             horizontal = dimensionResource(id = R.dimen.list_margin_horizontal),
             vertical = dimensionResource(id = R.dimen.list_margin_vertical)
@@ -111,7 +142,7 @@ fun VerticalGridBookmarkContent(
             items = bookmarkUiState,
             key = { it.imageUrl }
         ) { document ->
-            ContentItem(
+            BookmarkItem(
                 modifier = Modifier
                     .fillMaxWidth(),
                 documentUiState = document,
@@ -123,11 +154,16 @@ fun VerticalGridBookmarkContent(
 @Preview(showBackground = true)
 @Composable
 fun BookmarkScreenPreview(
-    @PreviewParameter(BookmarkUiStateProvider::class) item: UiState<List<DocumentUiState>>,
+    @PreviewParameter(BookmarkUiStateProvider::class) items: Pair<SearchUiState, UiState<List<DocumentUiState>>>,
 ) {
+    val searchUiState = items.first
+    val bookmarkUiState = items.second
+
     ComposeApplicationTheme {
         BookmarkScreen(
-            bookmarkUiState = item,
+            searchUiState = searchUiState,
+            bookmarkUiState = bookmarkUiState,
+            onSearchbarUiEvent = { },
             modifier = Modifier.fillMaxSize()
         )
     }
