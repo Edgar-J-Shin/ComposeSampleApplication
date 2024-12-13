@@ -10,7 +10,7 @@ import javax.inject.Inject
 @Reusable
 class GetImagesUseCase
 @Inject constructor(
-    private val imageRepository: ImageRepository
+    private val imageRepository: ImageRepository,
 ) {
     operator fun invoke(query: String): Flow<PagingData<Document>> {
         return imageRepository.getImages(query)

@@ -5,18 +5,25 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
+import com.shinjh1253.domain.usecase.GetBookmarksUseCase
 import com.shinjh1253.domain.usecase.GetImagesUseCase
+import com.shinjh1253.domain.usecase.UpdateBookmarkUseCase
+import com.shinjh1253.domain.usecase.UpdateKeywordUseCase
 import com.shinjh1253.presentation.core.state.SnackbarState
 import com.shinjh1253.presentation.core.ui.EventDelegate
+import com.shinjh1253.presentation.model.DocumentUiState
 import com.shinjh1253.presentation.model.KeywordUiState
 import com.shinjh1253.presentation.model.SearchUiState
+import com.shinjh1253.presentation.model.mapper.toEntity
 import com.shinjh1253.presentation.model.mapper.toUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -28,10 +35,26 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val getImagesUseCase: GetImagesUseCase
+    private val getImagesUseCase: GetImagesUseCase,
+    private val updateBookmarkUseCase: UpdateBookmarkUseCase,
+    private val getBookmarksUseCase: GetBookmarksUseCase,
+    private val updateKeywordUseCase: UpdateKeywordUseCase
 ) :
     ViewModel(),
     EventDelegate<SearchUiEffect, SearchUiEvent> by EventDelegate.EventDelegateImpl() {
+
+    private val coroutineExceptionHandler =
+        CoroutineExceptionHandler { _, exception ->
+            viewModelScope.launch {
+                emitUiEffect(
+                    SearchUiEffect.ShowSnackbar(
+                        state = SnackbarState.ErrorMessage(
+                            errorMsg = exception.message ?: "Unknown Error"
+                        )
+                    )
+                )
+            }
+        }
 
     private val _searchUiState = MutableStateFlow(SearchUiState.Empty)
     val searchUiState = _searchUiState.asStateFlow()
@@ -40,10 +63,28 @@ class SearchViewModel @Inject constructor(
     val searchResultUiState = searchUiState
         .debounce(1000L)
         .flatMapLatest {
+            updateKeywordUseCase(it.query.keyword)
+
             if (it.queryNotEmpty()) {
                 getImagesUseCase(it.query.keyword)
-                    .map { pagingData -> pagingData.map { document -> document.toUiState() } }
+                    .map { pagingData ->
+                        pagingData.map { document ->
+                            document.toUiState()
+                        }
+                    }
                     .cachedIn(viewModelScope)
+                    .combine(getBookmarksUseCase(it.query.keyword)) { pagingData, bookmarks ->
+                        // 북마크 적용
+                        pagingData.map { documentUiState ->
+                            documentUiState.copy(
+                                bookmark = bookmarks.any { bookmark ->
+                                    bookmark.imageUrl == documentUiState.imageUrl
+                                }
+                            ).apply {
+                                onBookmarkClick = ::updateBookmark
+                            }
+                        }
+                    }
             } else {
                 flowOf(PagingData.empty())
             }
@@ -65,8 +106,24 @@ class SearchViewModel @Inject constructor(
     private fun search(query: String) {
         viewModelScope.launch {
             if (query.isEmpty()) {
-                emitUiEffect(SearchUiEffect.ShowSnackbar(state = SnackbarState.SearchQueryEmptyError))
+                emitUiEffect(SearchUiEffect.ShowSnackbar(state = SnackbarState.EmptyQueryErrorMessage))
+                clearSearchText()
+            } else {
+                changeSearchText(query)
             }
+        }
+    }
+
+    private fun updateBookmark(
+        documentUiState: DocumentUiState,
+        isBookmarked: Boolean,
+    ) {
+        viewModelScope.launch(coroutineExceptionHandler) {
+            updateBookmarkUseCase(
+                keyword = searchUiState.value.query.keyword,
+                document = documentUiState.toEntity(),
+                isBookmarked = isBookmarked,
+            )
         }
     }
 

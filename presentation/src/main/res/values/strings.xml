@@ -11,4 +11,5 @@
     <string name="retry">retry</string>
     <string name="empty_content_list_message">Empty contents!</string>
     <string name="image_content_description">image</string>
+    <string name="desc_bookmark">bookmark</string>
 </resources>

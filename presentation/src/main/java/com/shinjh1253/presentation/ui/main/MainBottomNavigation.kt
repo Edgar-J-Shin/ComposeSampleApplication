@@ -22,10 +22,10 @@ import com.shinjh1253.presentation.ui.Screen
 fun MainBottomNavigation(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    items: List<Screen.Main.MainTab> =
+    items: List<Screen.MainTab> =
         listOf(
-            Screen.Main.MainTab.Search,
-            Screen.Main.MainTab.Bookmark,
+            Screen.MainTab.Search,
+            Screen.MainTab.Bookmark,
         ),
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()

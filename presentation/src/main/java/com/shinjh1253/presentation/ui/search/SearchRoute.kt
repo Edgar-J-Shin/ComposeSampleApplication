@@ -5,15 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
@@ -25,58 +19,55 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemKey
 import com.shinjh1253.presentation.R
-import com.shinjh1253.presentation.core.ui.BasicImage
 import com.shinjh1253.presentation.core.ui.ErrorScreen
 import com.shinjh1253.presentation.core.ui.LoadingScreen
 import com.shinjh1253.presentation.model.DocumentUiState
 import com.shinjh1253.presentation.model.SearchUiState
+import com.shinjh1253.presentation.model.SearchUiStateProvider
+import com.shinjh1253.presentation.ui.component.VerticalGridContent
+import com.shinjh1253.presentation.ui.theme.ComposeApplicationTheme
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun SearchRoute(
     viewModel: SearchViewModel = hiltViewModel(),
     showSnackBar: (String, SnackbarDuration) -> Unit = { _, _ -> },
 ) {
-//    val context = LocalContext.current
-//    viewModel.effect.collectAsEffect { effect ->
-//        when (effect) {
-//            is SearchEffect.NavigateToSearchResult -> {
-//                navigateToSearchResult(effect.keyword)
-//            }
-//
-//            is SearchEffect.ShowSnackbar -> {
-//                showSnackBar(
-//                    context.getString(effect.state.messageResId),
-//                    effect.state.duration
-//                )
-//            }
-//        }
-//    }
+    val context = LocalContext.current
+    LaunchedEffect(key1 = viewModel.uiEffect) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is SearchUiEffect.ShowSnackbar -> {
+                    showSnackBar(
+                        effect.state.getMessage(context),
+                        effect.state.duration
+                    )
+                }
+            }
+        }
+    }
 
     val searchUiState by viewModel.searchUiState.collectAsStateWithLifecycle()
     val searchResultUiState = viewModel.searchResultUiState.collectAsLazyPagingItems()
@@ -146,10 +137,11 @@ private fun SearchTopBar(
             onSearchUiEvent(SearchUiEvent.OnSearchTextChanged(it))
         },
         onSearch = {
+            focusManager.clearFocus()
             onSearchUiEvent(SearchUiEvent.OnSearch(it))
         },
         active = false,
-        onActiveChange = { /*onSearchActiveChange(it)*/ },
+        onActiveChange = { },
         placeholder = {
             Text(text = stringResource(id = R.string.searchbar_hint))
         },
@@ -232,68 +224,21 @@ fun SearchResult(
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-fun VerticalGridContent(
-    pagingItems: LazyPagingItems<DocumentUiState>,
-    modifier: Modifier = Modifier,
+fun SearchScreenPreview(
+    @PreviewParameter(SearchUiStateProvider::class) items: Pair<SearchUiState, PagingData<DocumentUiState>>,
 ) {
-    val gridState = rememberLazyGridState()
+    val searchUiState = items.first
+    val pagingItems = flowOf(items.second).collectAsLazyPagingItems()
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        state = gridState,
-
-        contentPadding = PaddingValues(
-            horizontal = dimensionResource(id = R.dimen.list_margin_horizontal),
-            vertical = dimensionResource(id = R.dimen.list_margin_vertical)
-        ),
-        modifier = modifier
-    ) {
-        items(
-            count = pagingItems.itemCount,
-            key = pagingItems.itemKey { it.imageUrl }
-        ) { index ->
-            pagingItems[index]?.let { documentUiState ->
-                ImageItem(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    documentUiState = documentUiState,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun ImageItem(
-    documentUiState: DocumentUiState,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(all = 4.dp)
-    ) {
-        BasicImage(
-            imageUrl = documentUiState.thumbnailUrl,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(all = 4.dp)
-                .clip(RoundedCornerShape(8.dp))
-        )
-
-        Text(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp),
-            text = documentUiState.displaySitename,
-            textAlign = TextAlign.Left,
-            maxLines = 1,
-            fontSize = 12.sp,
-            color = Color.Black,
-            overflow = TextOverflow.Ellipsis,
-            fontWeight = FontWeight.Bold,
+    ComposeApplicationTheme {
+        SearchScreen(
+            searchUiState = searchUiState,
+            pagingItems = pagingItems,
+            onSearchUiEvent = { },
+            modifier = Modifier.fillMaxSize()
         )
     }
 }
+
