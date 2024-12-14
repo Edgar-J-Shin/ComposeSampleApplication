@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.Button
@@ -15,11 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
@@ -86,6 +89,8 @@ private fun SearchScreen(
         SearchTopBar(
             searchUiState = searchUiState,
             onSearchbarUiEvent = onSearchbarUiEvent,
+            modifier = Modifier
+                .fillMaxWidth()
         )
 
         SearchResult(
@@ -156,11 +161,17 @@ fun VerticalGridContent(
     pagingItems: LazyPagingItems<DocumentUiState>,
     modifier: Modifier = Modifier,
     onBookmarkClick: ((DocumentUiState, Boolean) -> Unit) = { _, _ -> },
+    gridState: LazyGridState = rememberLazyGridState()
 ) {
-    val gridState = rememberLazyGridState()
+    val configuration = LocalConfiguration.current
+    val minSize = when {
+        configuration.screenWidthDp > 840 -> 240.dp
+        configuration.screenWidthDp > 600 -> 200.dp
+        else -> 160.dp
+    }
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
+        columns = GridCells.Adaptive(minSize = minSize),
         state = gridState,
 
         contentPadding = PaddingValues(
@@ -186,6 +197,11 @@ fun VerticalGridContent(
 }
 
 @Preview(showBackground = true)
+@Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
+@Preview(showBackground = true, device = "spec:width=673.5dp,height=841dp,dpi=480")
+@Preview(showBackground = true, device = "spec:width=1280dp,height=800dp,dpi=480")
+@Preview(showBackground = true, device = "spec:width=1920dp,height=1080dp,dpi=480")
+
 @Composable
 fun SearchScreenPreview(
     @PreviewParameter(SearchUiStateProvider::class) items: Pair<SearchUiState, PagingData<DocumentUiState>>,

@@ -149,6 +149,8 @@ private fun BookmarkScreen(
             SearchTopBar(
                 searchUiState = searchUiState,
                 onSearchbarUiEvent = onSearchbarUiEvent,
+                modifier = Modifier
+                    .fillMaxWidth(),
             )
 
             Row(
