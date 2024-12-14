@@ -32,6 +32,21 @@ data class DocumentUiState(
     }
 }
 
+class ContentItemUiStateProvider :
+    PreviewParameterProvider<DocumentUiState> {
+    private val documentUiState = DocumentUiState.DefaultForPreview
+
+    override val values: Sequence<DocumentUiState>
+        get() = sequenceOf(
+            documentUiState.copy(
+                bookmark = false
+            ),
+            documentUiState.copy(
+                bookmark = true
+            )
+        )
+}
+
 class BookmarkItemUiStateProvider :
     PreviewParameterProvider<Pair<Boolean, DocumentUiState>> {
     private val documentUiState = DocumentUiState.DefaultForPreview

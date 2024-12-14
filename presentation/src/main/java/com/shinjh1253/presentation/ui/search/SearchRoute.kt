@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -144,7 +143,7 @@ fun SearchResult(
                 }
 
                 isNotLoading -> {
-                    VerticalGridContent(
+                    SearchResultContents(
                         pagingItems = pagingItems,
                         onBookmarkClick = onBookmarkClick,
                         modifier = Modifier
@@ -157,21 +156,14 @@ fun SearchResult(
 }
 
 @Composable
-fun VerticalGridContent(
+fun SearchResultContents(
     pagingItems: LazyPagingItems<DocumentUiState>,
     modifier: Modifier = Modifier,
-    onBookmarkClick: ((DocumentUiState, Boolean) -> Unit) = { _, _ -> },
-    gridState: LazyGridState = rememberLazyGridState()
+    gridState: LazyGridState = rememberLazyGridState(),
+    onBookmarkClick: ((DocumentUiState, Boolean) -> Unit) = { _, _ -> }
 ) {
-    val configuration = LocalConfiguration.current
-    val minSize = when {
-        configuration.screenWidthDp > 840 -> 240.dp
-        configuration.screenWidthDp > 600 -> 200.dp
-        else -> 160.dp
-    }
-
     LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = minSize),
+        columns = GridCells.Adaptive(minSize = 300.dp),
         state = gridState,
 
         contentPadding = PaddingValues(
@@ -201,7 +193,6 @@ fun VerticalGridContent(
 @Preview(showBackground = true, device = "spec:width=673.5dp,height=841dp,dpi=480")
 @Preview(showBackground = true, device = "spec:width=1280dp,height=800dp,dpi=480")
 @Preview(showBackground = true, device = "spec:width=1920dp,height=1080dp,dpi=480")
-
 @Composable
 fun SearchScreenPreview(
     @PreviewParameter(SearchUiStateProvider::class) items: Pair<SearchUiState, PagingData<DocumentUiState>>,
