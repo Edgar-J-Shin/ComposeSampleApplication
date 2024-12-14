@@ -33,5 +33,10 @@ sealed class Screen(
     companion object {
         const val ROUTE_SEARCH = "search"
         const val ROUTE_BOOKMARK = "bookmark"
+
+        val mainTabItems = persistentListOf(
+            MainTab.Search,
+            MainTab.Bookmark,
+        )
     }
 }

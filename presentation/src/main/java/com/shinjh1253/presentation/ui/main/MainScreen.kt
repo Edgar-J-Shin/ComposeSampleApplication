@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 fun MainRoute(
     modifier: Modifier = Modifier,
     navHostController: NavHostController = rememberNavController(),
+    tabItems: List<Screen.MainTab> = Screen.mainTabItems
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -31,12 +32,14 @@ fun MainRoute(
     Scaffold(
         topBar = {
             MainTopBar(
-                navController = navHostController
+                navController = navHostController,
+                tabItems = tabItems
             )
         },
         bottomBar = {
             MainBottomNavigation(
                 navController = navHostController,
+                tabItems = tabItems
             )
         },
         snackbarHost = {

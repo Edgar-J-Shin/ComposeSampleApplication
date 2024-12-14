@@ -23,18 +23,7 @@ data class SearchUiState(
 class SearchUiStateProvider :
     PreviewParameterProvider<Pair<SearchUiState, PagingData<DocumentUiState>>> {
 
-    private val documentUiState = DocumentUiState(
-        collection = "blog",
-        datetime = LocalDateTime.now(),
-        displaySitename = "네이버블로그",
-        docUrl = "http://blog.naver.com/jec_crabhouse/223526236563",
-        height = 640,
-        imageUrl = "https://ugcmk-phinf.pstatic.net/MjAyNDA3MjZfMjUz/MDAxNzIxOTg4MjgwNjIx.-j5JEEyv1yq7qx_x9jy7vc15sS1V4To5V9PCI5wgK1Mg._z03x5HYSbpBWKCu4Jpc6fAguA9A95A8XR91D6QHoq4g.PNG/photo40334154.png?type=ffn640_640",
-        thumbnailUrl = "https://search2.kakaocdn.net/argon/130x130_85_c/F7dxEGFEerb",
-        width = 640,
-        bookmark = false,
-        isSelected = false
-    )
+    private val documentUiState = DocumentUiState.DefaultForPreview
 
     /**
      * 1. Init

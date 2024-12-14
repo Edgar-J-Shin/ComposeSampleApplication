@@ -9,16 +9,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -113,7 +116,7 @@ private fun BookmarkScreen(
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                     fontSize = 12.sp,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onBackground,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
                 )
@@ -149,6 +152,8 @@ private fun BookmarkScreen(
             SearchTopBar(
                 searchUiState = searchUiState,
                 onSearchbarUiEvent = onSearchbarUiEvent,
+                modifier = Modifier
+                    .fillMaxWidth(),
             )
 
             Row(
@@ -163,7 +168,7 @@ private fun BookmarkScreen(
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                     fontSize = 12.sp,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onBackground,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
                 )
@@ -235,9 +240,13 @@ fun BookmarkContents(
     editModeUiState: Boolean,
     bookmarkUiState: List<DocumentUiState>,
     modifier: Modifier = Modifier,
+    gridState: LazyGridState = rememberLazyGridState(),
     onCheckedChange: (DocumentUiState, Boolean) -> Unit = { _, _ -> },
 ) {
-    LazyColumn(
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 300.dp),
+        state = gridState,
+
         contentPadding = PaddingValues(
             horizontal = dimensionResource(id = R.dimen.list_margin_horizontal),
             vertical = dimensionResource(id = R.dimen.list_margin_vertical)
@@ -260,6 +269,10 @@ fun BookmarkContents(
 }
 
 @Preview(showBackground = true)
+@Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
+@Preview(showBackground = true, device = "spec:width=673.5dp,height=841dp,dpi=480")
+@Preview(showBackground = true, device = "spec:width=1280dp,height=800dp,dpi=480")
+@Preview(showBackground = true, device = "spec:width=1920dp,height=1080dp,dpi=480")
 @Composable
 fun BookmarkScreenPreview(
     @PreviewParameter(BookmarkUiStateProvider::class) items: Pair<SearchUiState, UiState<List<DocumentUiState>>>,
