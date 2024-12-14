@@ -21,21 +21,17 @@ import com.shinjh1253.presentation.ui.Screen
 @Composable
 fun MainBottomNavigation(
     navController: NavHostController,
+    tabItems: List<Screen.MainTab>,
     modifier: Modifier = Modifier,
-    items: List<Screen.MainTab> =
-        listOf(
-            Screen.MainTab.Search,
-            Screen.MainTab.Bookmark,
-        ),
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    AnimatedVisibility(visible = items.any { it.route == currentDestination?.route }) {
+    AnimatedVisibility(visible = tabItems.any { it.route == currentDestination?.route }) {
         NavigationBar(
             modifier = modifier,
         ) {
-            items.forEach { screen ->
+            tabItems.forEach { screen ->
                 NavigationBarItem(
                     label = {
                         Text(text = stringResource(id = screen.titleResId))
