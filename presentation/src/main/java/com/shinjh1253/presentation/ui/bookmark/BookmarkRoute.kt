@@ -15,13 +15,13 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -116,7 +116,7 @@ private fun BookmarkScreen(
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                     fontSize = 12.sp,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onBackground,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
                 )
@@ -168,7 +168,7 @@ private fun BookmarkScreen(
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                     fontSize = 12.sp,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onBackground,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
                 )
