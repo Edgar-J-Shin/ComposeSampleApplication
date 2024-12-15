@@ -78,7 +78,7 @@ fun BookmarkRoute(
         bookmarkUiState = bookmarkUiState,
         selectedCount = { selectedBookmarks.count() },
         totalCount = { totalCount },
-        onSearchbarUiEvent = viewModel::dispatchSearchEvent,
+        onSearchbarUiEvent = viewModel::dispatchSearchbarEvent,
         onEditModeClick = viewModel::changeEditMode,
         onRemoveBookmarksClick = viewModel::removeBookmarks,
         onCheckedChange = viewModel::changeBookmarkChecked,

@@ -1,13 +1,20 @@
 package com.shinjh1253.data.local.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.time.LocalDateTime
 
-@Entity(tableName = "documents", indices = [Index(value = ["imageUrl"], unique = true)])
+@Entity(tableName = "documents")
 data class DocumentEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    @Embedded
+    val documentMetaEntity: DocumentMetaEntity,
+    val keyword: String
+)
+
+data class DocumentMetaEntity(
     val collection: String,
     val datetime: LocalDateTime,
     val displaySitename: String,
@@ -16,5 +23,4 @@ data class DocumentEntity(
     val imageUrl: String,
     val thumbnailUrl: String,
     val width: Int,
-    val keyword: String
 )

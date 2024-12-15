@@ -15,6 +15,7 @@ import com.shinjh1253.presentation.model.KeywordUiState
 import com.shinjh1253.presentation.model.SearchUiState
 import com.shinjh1253.presentation.model.mapper.toEntity
 import com.shinjh1253.presentation.model.mapper.toUiState
+import com.shinjh1253.presentation.ui.component.searchbar.SearchbarEventDelegate
 import com.shinjh1253.presentation.ui.component.searchbar.SearchbarUiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -25,7 +26,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -40,7 +40,8 @@ class SearchViewModel @Inject constructor(
     private val getBookmarksUseCase: GetBookmarksUseCase,
 ) :
     ViewModel(),
-    EventDelegate<SearchUiEffect, SearchUiEvent> by EventDelegate.EventDelegateImpl() {
+    EventDelegate<SearchUiEffect, SearchUiEvent> by EventDelegate.EventDelegateImpl(),
+    SearchbarEventDelegate<SearchbarUiEvent> by SearchbarEventDelegate.SearchbarEventDelegateImpl(){
 
     private val coroutineExceptionHandler =
         CoroutineExceptionHandler { _, exception ->
@@ -61,7 +62,6 @@ class SearchViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val searchResultUiState = searchUiState
         .debounce(1000L)
-        .filter { it.queryNotEmpty() }
         .map { it.query.keyword }
         .flatMapLatest { keyword ->
             getImagesUseCase(keyword)
@@ -120,7 +120,7 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    fun dispatchSearchEvent(event: SearchbarUiEvent) {
+    override fun dispatchSearchbarEvent(event: SearchbarUiEvent) {
         when (event) {
             is SearchbarUiEvent.OnSearchTextChanged -> {
                 updateSearchText(event.query)

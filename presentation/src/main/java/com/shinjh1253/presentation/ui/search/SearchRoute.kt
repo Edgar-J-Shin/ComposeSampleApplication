@@ -67,7 +67,7 @@ fun SearchRoute(
     SearchScreen(
         searchUiState = searchUiState,
         pagingItems = searchResultUiState,
-        onSearchbarUiEvent = viewModel::dispatchSearchEvent,
+        onSearchbarUiEvent = viewModel::dispatchSearchbarEvent,
         onBookmarkClick = viewModel::updateBookmark,
         modifier = Modifier.fillMaxSize(),
     )
@@ -109,14 +109,14 @@ fun SearchResult(
     modifier: Modifier = Modifier,
     onBookmarkClick: ((DocumentUiState, Boolean) -> Unit) = { _, _ -> },
 ) {
+    val isLoading = pagingItems.loadState.refresh is LoadState.Loading
+    val isNotLoading = pagingItems.loadState.refresh is LoadState.NotLoading
+    val isError = pagingItems.loadState.refresh is LoadState.Error
+    val isEmpty = pagingItems.itemCount == 0
+
     Box(
         modifier = modifier
     ) {
-        val isLoading = pagingItems.loadState.refresh is LoadState.Loading
-        val isNotLoading = pagingItems.loadState.refresh is LoadState.NotLoading
-        val isError = pagingItems.loadState.refresh is LoadState.Error
-        val isEmpty = pagingItems.itemCount == 0
-
         if (isQueryEmpty()) {
             TextScreen(message = stringResource(id = R.string.input_query_message))
         } else {
@@ -139,7 +139,7 @@ fun SearchResult(
                 }
 
                 isEmpty -> {
-                    ErrorScreen(message = stringResource(id = R.string.empty_search_result_message))
+                    TextScreen(message = stringResource(id = R.string.empty_search_result_message))
                 }
 
                 isNotLoading -> {

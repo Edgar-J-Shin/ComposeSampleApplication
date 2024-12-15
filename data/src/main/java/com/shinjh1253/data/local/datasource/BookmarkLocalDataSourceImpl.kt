@@ -15,13 +15,14 @@ class BookmarkLocalDataSourceImpl
     override fun getBookmarks(keyword: String): Flow<List<LocalDocument>> =
         if (keyword.isEmpty()) {
             bookmarkDao.selectAll()
+                .map { documents ->
+                    documents.distinctBy { document -> document.documentMetaEntity.imageUrl }
+                }
         } else {
             bookmarkDao.selectByKeyword(keyword)
         }
             .map { documents ->
-                documents
-                    .distinctBy { document -> document.imageUrl }
-                    .map { document -> document.toLocal() }
+                documents.map { document -> document.toLocal() }
             }
 
 
