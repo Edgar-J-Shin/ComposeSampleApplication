@@ -16,7 +16,7 @@ class BookmarkLocalDataSourceImpl
         if (keyword.isEmpty()) {
             bookmarkDao.selectAll()
                 .map { documents ->
-                    documents.distinctBy { document -> document.imageUrl }
+                    documents.distinctBy { document -> document.documentMetaEntity.imageUrl }
                 }
         } else {
             bookmarkDao.selectByKeyword(keyword)
