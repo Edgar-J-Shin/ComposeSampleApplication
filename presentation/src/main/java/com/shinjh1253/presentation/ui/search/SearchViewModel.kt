@@ -10,12 +10,12 @@ import com.shinjh1253.domain.usecase.GetImagesUseCase
 import com.shinjh1253.domain.usecase.UpdateBookmarkUseCase
 import com.shinjh1253.presentation.core.state.SnackbarState
 import com.shinjh1253.presentation.core.ui.EventDelegate
-import com.shinjh1253.presentation.ui.component.searchbar.SearchbarEventDelegate
 import com.shinjh1253.presentation.model.DocumentUiState
 import com.shinjh1253.presentation.model.KeywordUiState
 import com.shinjh1253.presentation.model.SearchUiState
 import com.shinjh1253.presentation.model.mapper.toEntity
 import com.shinjh1253.presentation.model.mapper.toUiState
+import com.shinjh1253.presentation.ui.component.searchbar.SearchbarEventDelegate
 import com.shinjh1253.presentation.ui.component.searchbar.SearchbarUiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -63,7 +62,6 @@ class SearchViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val searchResultUiState = searchUiState
         .debounce(1000L)
-        .filter { it.queryNotEmpty() }
         .map { it.query.keyword }
         .flatMapLatest { keyword ->
             getImagesUseCase(keyword)
