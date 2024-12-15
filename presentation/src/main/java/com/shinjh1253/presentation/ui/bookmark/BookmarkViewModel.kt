@@ -16,6 +16,7 @@ import com.shinjh1253.presentation.model.mapper.toUiState
 import com.shinjh1253.presentation.ui.component.searchbar.SearchbarEventDelegate
 import com.shinjh1253.presentation.ui.component.searchbar.SearchbarUiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +39,19 @@ class BookmarkViewModel @Inject constructor(
     ViewModel(),
     EventDelegate<BookmarkUiEffect, BookmarkUiEvent> by EventDelegate.EventDelegateImpl(),
     SearchbarEventDelegate<SearchbarUiEvent> by SearchbarEventDelegate.SearchbarEventDelegateImpl() {
+
+    private val coroutineExceptionHandler =
+        CoroutineExceptionHandler { _, exception ->
+            viewModelScope.launch {
+                emitUiEffect(
+                    BookmarkUiEffect.ShowSnackbar(
+                        state = SnackbarState.ErrorMessage(
+                            errorMsg = exception.message ?: "Unknown Error"
+                        )
+                    )
+                )
+            }
+        }
 
     private val _selectedBookmarks: MutableStateFlow<List<DocumentUiState>> =
         MutableStateFlow(emptyList())
@@ -123,7 +137,7 @@ class BookmarkViewModel @Inject constructor(
     }
 
     fun removeBookmarks() {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineExceptionHandler) {
             removeBookmarksUseCase(
                 bookmarks = selectedBookmarks.value.map { it.toEntity() })
                 .collect {
