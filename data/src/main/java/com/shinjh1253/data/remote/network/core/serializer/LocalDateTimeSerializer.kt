@@ -1,4 +1,4 @@
-package com.shinjh1253.data.remote
+package com.shinjh1253.data.remote.network.core.serializer
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer

@@ -1,10 +1,11 @@
-package com.shinjh1253.data.local.model.mapper
+package com.shinjh1253.data.local.db.model.mapper
 
+import com.shinjh1253.data.local.db.model.DocumentEntity
+import com.shinjh1253.data.local.db.model.DocumentRawEntity
 import com.shinjh1253.data.local.model.LocalDocument
-import com.shinjh1253.domain.model.Document
 
-fun LocalDocument.toEntity(): Document =
-    Document(
+fun DocumentEntity.toLocal(): LocalDocument = documentRawEntity.run {
+    LocalDocument(
         collection = collection,
         datetime = datetime,
         displaySitename = displaySitename,
@@ -14,9 +15,16 @@ fun LocalDocument.toEntity(): Document =
         thumbnailUrl = thumbnailUrl,
         width = width
     )
+}
 
-fun Document.toLocal(): LocalDocument =
-    LocalDocument(
+fun LocalDocument.toDto(keyword: String = ""): DocumentEntity =
+    DocumentEntity(
+        documentRawEntity = toRawDto(),
+        keyword = keyword
+    )
+
+fun LocalDocument.toRawDto(): DocumentRawEntity =
+    DocumentRawEntity(
         collection = collection,
         datetime = datetime,
         displaySitename = displaySitename,

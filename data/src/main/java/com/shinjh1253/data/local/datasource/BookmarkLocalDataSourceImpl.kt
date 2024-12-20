@@ -1,9 +1,9 @@
 package com.shinjh1253.data.local.datasource
 
-import com.shinjh1253.data.local.dao.BookmarkDao
+import com.shinjh1253.data.local.db.dao.BookmarkDao
+import com.shinjh1253.data.local.db.model.mapper.toDto
+import com.shinjh1253.data.local.db.model.mapper.toLocal
 import com.shinjh1253.data.local.model.LocalDocument
-import com.shinjh1253.data.local.model.mapper.toDto
-import com.shinjh1253.data.local.model.mapper.toLocal
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -16,7 +16,7 @@ class BookmarkLocalDataSourceImpl
         if (keyword.isEmpty()) {
             bookmarkDao.selectAll()
                 .map { documents ->
-                    documents.distinctBy { document -> document.documentMetaEntity.imageUrl }
+                    documents.distinctBy { document -> document.documentRawEntity.imageUrl }
                 }
         } else {
             bookmarkDao.selectByKeyword(keyword)

@@ -1,6 +1,6 @@
-package com.shinjh1253.data.remote.service
+package com.shinjh1253.data.remote.network.service
 
-import com.shinjh1253.data.remote.model.GetImageResponse
+import com.shinjh1253.data.remote.model.GetImagesResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -23,5 +23,5 @@ interface KakaoApiService {
         @Query("sort") sort: String = "accuracy",
         @Query("page") page: Int,
         @Query("size") size: Int = 80,
-    ): Response<GetImageResponse>
+    ): Response<GetImagesResponse>
 }

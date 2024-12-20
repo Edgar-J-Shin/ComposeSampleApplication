@@ -1,4 +1,4 @@
-package com.shinjh1253.data.local.dao
+package com.shinjh1253.data.local.db.dao
 
 import androidx.room.Delete
 import androidx.room.Insert

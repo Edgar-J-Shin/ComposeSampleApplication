@@ -1,12 +1,12 @@
 package com.shinjh1253.data.remote.model
 
-import com.shinjh1253.data.remote.LocalDateTimeSerializer
+import com.shinjh1253.data.remote.network.core.serializer.LocalDateTimeSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
 @Serializable
-data class GetImageResponse(
+data class GetImagesResponse(
     val documents: List<RemoteDocument>,
     val meta: RemoteMeta,
 )

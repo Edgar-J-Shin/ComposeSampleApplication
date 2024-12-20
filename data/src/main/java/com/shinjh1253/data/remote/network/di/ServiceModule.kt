@@ -1,6 +1,6 @@
-package com.shinjh1253.data.di
+package com.shinjh1253.data.remote.network.di
 
-import com.shinjh1253.data.remote.service.KakaoApiService
+import com.shinjh1253.data.remote.network.service.KakaoApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,5 +13,6 @@ import javax.inject.Singleton
 class ServiceModule {
     @Provides
     @Singleton
-    fun provideKakaoApiService(retrofit: Retrofit): KakaoApiService = retrofit.create(KakaoApiService::class.java)
+    fun provideKakaoApiService(retrofit: Retrofit): KakaoApiService = retrofit.create(
+        KakaoApiService::class.java)
 }

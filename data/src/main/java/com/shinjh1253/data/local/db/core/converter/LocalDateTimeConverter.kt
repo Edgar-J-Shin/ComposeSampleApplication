@@ -1,4 +1,4 @@
-package com.shinjh1253.data.local
+package com.shinjh1253.data.local.db.core.converter
 
 import androidx.room.TypeConverter
 import java.time.Instant

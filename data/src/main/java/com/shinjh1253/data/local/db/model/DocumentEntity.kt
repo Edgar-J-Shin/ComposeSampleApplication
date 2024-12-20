@@ -1,4 +1,4 @@
-package com.shinjh1253.data.local.model
+package com.shinjh1253.data.local.db.model
 
 import androidx.room.Embedded
 import androidx.room.Entity
@@ -10,11 +10,11 @@ data class DocumentEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     @Embedded
-    val documentMetaEntity: DocumentMetaEntity,
+    val documentRawEntity: DocumentRawEntity,
     val keyword: String
 )
 
-data class DocumentMetaEntity(
+data class DocumentRawEntity(
     val collection: String,
     val datetime: LocalDateTime,
     val displaySitename: String,

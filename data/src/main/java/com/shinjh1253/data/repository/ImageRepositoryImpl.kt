@@ -16,7 +16,10 @@ class ImageRepositoryImpl @Inject constructor(
 
     override fun getImages(query: String): Flow<PagingData<Document>> =
         Pager(
-            config = PagingConfig(enablePlaceholders = false, pageSize = 80),
+            config = PagingConfig(
+                enablePlaceholders = false,
+                pageSize = 80
+            ),
             pagingSourceFactory = {
                 ImagePagingSource(
                     imageRemoteDataSource = imageRemoteDataSource,

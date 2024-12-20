@@ -1,7 +1,7 @@
 package com.shinjh1253.data.remote.datasource
 
-import com.shinjh1253.data.remote.model.GetImageResponse
-import com.shinjh1253.data.remote.service.KakaoApiService
+import com.shinjh1253.data.remote.model.GetImagesResponse
+import com.shinjh1253.data.remote.network.service.KakaoApiService
 import javax.inject.Inject
 
 class ImageRemoteDataSourceImpl
@@ -10,7 +10,10 @@ constructor(
     private val kakaoApiService: KakaoApiService,
 ) : ImageRemoteDataSource {
 
-    override suspend fun getImages(query: String, page: Int): Result<GetImageResponse> =
+    override suspend fun getImages(
+        query: String,
+        page: Int
+    ): Result<GetImagesResponse> =
         runCatching {
             val response = kakaoApiService.getImages(
                 query = query,
@@ -23,7 +26,7 @@ constructor(
                 }
             }
 
-            val message = response.errorBody()?.string() ?: "unknown error"
-            throw Throwable(message)
+            val errorMessage = response.errorBody()?.string() ?: "unknown error"
+            throw Throwable(errorMessage)
         }
 }

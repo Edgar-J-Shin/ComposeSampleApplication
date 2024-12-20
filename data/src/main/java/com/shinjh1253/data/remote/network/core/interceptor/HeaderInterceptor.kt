@@ -1,10 +1,11 @@
-package com.shinjh1253.data.remote
+package com.shinjh1253.data.remote.network.core.interceptor
 
+import com.shinjh1253.data.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
 
-class DefaultHeaderInterceptor
+class HeaderInterceptor
 @Inject
 constructor() : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -25,10 +26,14 @@ constructor() : Interceptor {
     }
 
     private fun getDefaultHeader(): Map<String, String> = mapOf(
-        "Authorization" to "KakaoAK $REST_API_KEY"
+        KEY_AUTHORIZATION to AUTHORIZATION_KAKAO
     )
 
     companion object {
-        private const val REST_API_KEY = "163b7a7661269639cc0c14df3f6c81cf"
+        // Key
+        private const val KEY_AUTHORIZATION = "Authorization"
+
+        // Value
+        private const val AUTHORIZATION_KAKAO = "KakaoAK ${BuildConfig.KAKAO_API_KEY}"
     }
 }

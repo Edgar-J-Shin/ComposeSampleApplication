@@ -1,9 +1,9 @@
-package com.shinjh1253.data.local.dao
+package com.shinjh1253.data.local.db.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
-import com.shinjh1253.data.local.model.DocumentEntity
+import com.shinjh1253.data.local.db.model.DocumentEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
